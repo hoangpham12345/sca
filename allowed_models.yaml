@@ -1,0 +1,30 @@
+# ==============================================================================
+# Enterprise LiteLLM Gateway - Authorized Models
+# Defines which models from the LiteLLM Proxy are exposed in the Chat Agent UI.
+# In production, these represent your enterprise-approved model catalogue.
+# ==============================================================================
+
+# Google Enterprise Agent Platform (Gemini Models)
+- google/gemini-3.8-flash
+- google/gemini-3.5-flash
+- google/gemini-3.1-pro-preview
+- google/gemini-3.1-flash-lite
+- google/gemini-4-argon
+
+# Anthropic Claude Models
+- claude-sonnet-5-5
+- claude-sonnet-5
+- claude-opus-5-5
+- claude-opus-5
+- claude-haiku-5-5
+- claude-haiku-4-5-20251001
+
+# DeepSeek Models
+- deepseek/deepseek-v4-pro
+- deepseek/deepseek-v4-flash
+- deepseek/deepseek-V3.2
+
+# OpenAI Models
+- gpt-5.5
+- gpt-5.4-mini
+- o4-mini

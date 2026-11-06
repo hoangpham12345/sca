@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise AI Agent & Workflow Navigator</title>
+  <!-- Local Vendor Scripts (Offline & Corporate Network Safe) -->
+  <script src="/vendor/tailwindcss.js"></script>
+  <script src="/vendor/lucide.min.js"></script>
+  <script src="/vendor/marked.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bgPrimary: '#0b0f19',
+            bgSecondary: '#0d1222',
+            bgCard: '#111728',
+            bgSubcard: '#0e1424',
+            borderSubtle: '#1e293b',
+          },
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    // Immediate theme restoration to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('preferred_theme') || 'dark';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      /* Crisp High-Contrast Light Theme */
+      --hex-0b0f19: #f8fafc;
+      --hex-0c1220: #f1f5f9;
+      --hex-0d1222: #f1f5f9;
+      --hex-101626: #e2e8f0;
+      --hex-111728: #ffffff;
+      --hex-0e1424: #f8fafc;
+      --hex-151d30: #e2e8f0;
+      --hex-131b2e: #e2e8f0;
+      --hex-162035: #e2e8f0;
+      --hex-1a2336: #cbd5e1;
+      --hex-1a2338: #cbd5e1;
+      --hex-1e293b: #cbd5e1;
+      --hex-22304d: #94a3b8;
+      --hex-2b3d63: #94a3b8;
+      --text-main: #0f172a;
+      --text-sub: #334155;
+      --text-muted: #64748b;
+      --border-subtle: #cbd5e1;
+      --border-card: #e2e8f0;
+      --bg-card: #ffffff;
+      --bg-code: #f1f5f9;
+      --bg-input: #ffffff;
+      --scrollbar-thumb: #cbd5e1;
+      --scrollbar-track: #f1f5f9;
+    }
+
+    html.dark {
+      /* High-Contrast, Deep Modern Dark Theme */
+      --hex-0b0f19: #070a12;
+      --hex-0c1220: #0c111e;
+      --hex-0d1222: #0c111e;
+      --hex-101626: #12192a;
+      --hex-111728: #141c2e;
+      --hex-0e1424: #0a0f1b;
+      --hex-151d30: #1a243a;
+      --hex-131b2e: #1a253d;
+      --hex-162035: #1c2842;
+      --hex-1a2336: #273754;
+      --hex-1a2338: #273754;
+      --hex-1e293b: #273754;
+      --hex-22304d: #384c73;
+      --hex-2b3d63: #384c73;
+      --text-main: #f8fafc;
+      --text-sub: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border-subtle: #273754;
+      --border-card: #283957;
+      --bg-card: #141c2e;
+      --bg-code: #080c16;
+      --bg-input: #0e1525;
+      --scrollbar-thumb: #283957;
+      --scrollbar-track: #070a12;
+    }
+
+    body {
+      background-color: var(--hex-0b0f19);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    /* Map Tailwind arbitrary classes to theme variables */
+    .bg-\[\#0b0f19\] { background-color: var(--hex-0b0f19) !important; }
+    .bg-\[\#0c1220\] { background-color: var(--hex-0c1220) !important; }
+    .bg-\[\#0d1222\] { background-color: var(--hex-0d1222) !important; }
+    .bg-\[\#101626\] { background-color: var(--hex-101626) !important; }
+    .bg-\[\#111728\] { background-color: var(--hex-111728) !important; }
+    .bg-\[\#0e1424\] { background-color: var(--hex-0e1424) !important; }
+    .bg-\[\#151d30\] { background-color: var(--hex-151d30) !important; }
+    .bg-\[\#131b2e\] { background-color: var(--hex-131b2e) !important; }
+    .bg-\[\#162035\] { background-color: var(--hex-162035) !important; }
+    .bg-\[\#080c14\] { background-color: var(--bg-code) !important; }
+    
+    .border-\[\#1e293b\] { border-color: var(--hex-1e293b) !important; }
+    .border-\[\#151d30\] { border-color: var(--hex-151d30) !important; }
+    .border-\[\#1a2336\] { border-color: var(--hex-1a2336) !important; }
+    .border-\[\#1a2336\]\/60 { border-color: var(--hex-1a2336) !important; }
+    .border-\[\#1a2338\] { border-color: var(--hex-1a2338) !important; }
+    .border-\[\#22304d\] { border-color: var(--hex-22304d) !important; }
+    .border-\[\#2b3d63\] { border-color: var(--hex-2b3d63) !important; }
+    .border-\[\#1e293b\]\/60 { border-color: var(--hex-1e293b) !important; }
+
+    /* High contrast text adaptations */
+    html:not(.dark) .text-slate-100,
+    html:not(.dark) .text-slate-200,
+    html:not(.dark) .text-slate-300 {
+      color: #0f172a !important;
+    }
+    html:not(.dark) .text-slate-400 {
+      color: #334155 !important;
+    }
+    html:not(.dark) .text-slate-500 {
+      color: #64748b !important;
+    }
+    html:not(.dark) .text-slate-600 {
+      color: #94a3b8 !important;
+    }
+
+    html.dark .text-slate-100 { color: #f8fafc !important; }
+    html.dark .text-slate-200 { color: #f1f5f9 !important; }
+    html.dark .text-slate-300 { color: #e2e8f0 !important; }
+    html.dark .text-slate-400 { color: #94a3b8 !important; } /* Clear, readable, no eye strain */
+    html.dark .text-slate-500 { color: #8392a7 !important; }
+
+    /* Input elements high contrast in both modes */
+    html:not(.dark) input,
+    html:not(.dark) select,
+    html:not(.dark) textarea {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html:not(.dark) select option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+    html.dark input,
+    html.dark select,
+    html.dark textarea {
+      background-color: var(--bg-input) !important;
+      color: #f8fafc !important;
+      border-color: var(--border-subtle) !important;
+    }
+    html.dark select option {
+      background-color: #141c2e !important;
+      color: #f8fafc !important;
+    }
+
+    /* User chat bubble */
+    html:not(.dark) .chat-message-item .bg-indigo-600\/20 {
+      background-color: #e0e7ff !important;
+      border-color: #a5b4fc !important;
+      color: #1e1b4b !important;
+    }
+    html:not(.dark) .chat-message-item .bg-indigo-600\/20 p {
+      color: #1e1b4b !important;
+    }
+
+    /* Assistant chat card elevation and shadow */
+    html:not(.dark) .chat-message-item .flex-1.bg-\[\#111728\] {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08) !important;
+    }
+    html.dark .chat-message-item .flex-1.bg-\[\#111728\] {
+      background-color: #141c2e !important;
+      border-color: #273754 !important;
+      box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Prose code and block styles */
+    html:not(.dark) .prose-chat pre {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html:not(.dark) .prose-chat code {
+      background-color: #e2e8f0 !important;
+      color: #0369a1 !important;
+    }
+    html:not(.dark) .prose-chat pre code {
+      background-color: transparent !important;
+      color: #0f172a !important;
+    }
+    html:not(.dark) .prose-chat h1,
+    html:not(.dark) .prose-chat h2,
+    html:not(.dark) .prose-chat h3 {
+      color: #0f172a !important;
+    }
+    html:not(.dark) .prose-chat blockquote {
+      background-color: #f1f5f9 !important;
+      border-left-color: #3b82f6 !important;
+      color: #1e293b !important;
+    }
+
+    html.dark .prose-chat pre {
+      background-color: #080c16 !important;
+      border-color: #263652 !important;
+      color: #e2e8f0 !important;
+    }
+    html.dark .prose-chat code {
+      background-color: #1a253c !important;
+      color: #38bdf8 !important;
+    }
+    html.dark .prose-chat blockquote {
+      background-color: #0d1424 !important;
+      border-left-color: #3b82f6 !important;
+      color: #cbd5e1 !important;
+    }
+
+    .mono-font {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    /* Native off-screen virtualization for long conversation threads */
+    .chat-message-item {
+      content-visibility: auto;
+      contain-intrinsic-size: 80px 180px;
+      max-width: 100% !important;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--hex-22304d);
+    }
+    /* Markdown prose styles for chat */
+    .prose-chat {
+      max-width: 100%;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .prose-chat pre {
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.375rem;
+      padding: 0.75rem;
+      overflow-x: auto;
+      max-width: 100%;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    .prose-chat table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    .prose-chat code {
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.8rem;
+    }
+    .prose-chat pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    .prose-chat p {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+    .prose-chat p:last-child {
+      margin-bottom: 0;
+    }
+    .prose-chat ul, .prose-chat ol {
+      margin-left: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .prose-chat li {
+      margin-bottom: 0.25rem;
+    }
+    .prose-chat h1, .prose-chat h2, .prose-chat h3 {
+      font-weight: 600;
+      margin-top: 0.75rem;
+      margin-bottom: 0.35rem;
+    }
+    .streaming-cursor::after {
+      content: '▋';
+      display: inline-block;
+      vertical-align: baseline;
+      animation: blink 1s step-start infinite;
+      color: #10b981;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col bg-[#0b0f19] text-[#e2e8f0] overflow-hidden select-none">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP HEADER & MODE SWITCHER STRIP                                       -->
+  <!-- ========================================================================= -->
+  <header class="border-b border-[#1e293b] bg-[#0b0f19] flex-none z-20">
+    <!-- Top brand bar -->
+    <div class="flex items-center justify-between px-4 py-1.5 border-b border-[#151d30]">
+      <div class="flex items-center gap-3">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <i data-lucide="bot" class="w-4 h-4"></i>
+          </div>
+          <span class="text-xs font-bold tracking-wide text-slate-200">Enterprise AI</span>
+        </div>
+
+        <!-- Mode Switcher Buttons on Top -->
+        <div class="flex items-center bg-[#101626] p-0.5 rounded-lg border border-[#1e293b] text-xs font-medium">
+          <button
+            id="btn-mode-chat"
+            onclick="switchAppMode('chat')"
+            class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all text-slate-400 hover:text-slate-200"
+          >
+            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+            <span>Chat</span>
+          </button>
+
+          <button
+            id="btn-mode-workflow"
+            onclick="switchAppMode('workflow')"
+            class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm font-semibold"
+          >
+            <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+            <span>Workflow</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <!-- Theme Toggle Button -->
+        <button
+          id="btn-theme-toggle"
+          onclick="toggleAppTheme()"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border border-[#1e293b] hover:bg-[#151d30] text-slate-300 hover:text-slate-100 transition-colors shadow-sm cursor-pointer"
+          title="Toggle Dark / Light Theme"
+        >
+          <i id="theme-toggle-icon" data-lucide="sun" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span id="theme-toggle-text">Light Mode</span>
+        </button>
+
+        <div class="flex items-center gap-2 text-[11px] text-emerald-400/90 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 font-mono">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <span id="gateway-endpoint-label">LiteLLM Proxy Gateway</span>
+        </div>
+        <button class="text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" title="Settings">
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Ticket Tabs Row (Visible in Workflow mode) -->
+    <div id="ticket-tabs-strip" class="flex items-center px-2 overflow-x-auto text-xs bg-[#0b0f19]">
+      <div id="ticket-tabs" class="flex items-center">
+        <!-- Dynamically filled by JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MODE 1: CHAT MODE CONTAINER                                               -->
+  <!-- ========================================================================= -->
+  <div id="container-chat" class="hidden flex-1 flex overflow-hidden">
+    
+    <!-- LEFT SIDEBAR: CHAT CONTROLS, MODELS, THREADS -->
+    <aside class="w-72 bg-[#0c1220] border-r border-[#1e293b] flex flex-col justify-between p-3 flex-none overflow-y-auto">
+      <div class="flex flex-col gap-3">
+        <!-- + New Chat Button -->
+        <button
+          onclick="startNewChat()"
+          class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold transition-all shadow-sm"
+        >
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>New Chat</span>
+        </button>
+
+        <!-- Model & Effort Selector Card -->
+        <div class="bg-[#111728] border border-[#1e293b] rounded-lg p-2.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="cpu" class="w-3 h-3 text-indigo-400"></i>
+              <span>Active Model</span>
+            </label>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-medium">Enterprise</span>
+          </div>
+          <select
+            id="chat-model-select"
+            class="w-full bg-[#0c1220] border border-[#1e293b] rounded p-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono mb-2"
+            onchange="handleChatModelChange()"
+          >
+            <!-- Populated via /api/models -->
+          </select>
+
+          <!-- Dynamic Effort Selector -->
+          <div id="chat-effort-container" class="pt-2 border-t border-[#1a2336]">
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] text-slate-400 flex items-center gap-1">
+                <i data-lucide="zap" class="w-2.5 h-2.5 text-amber-400"></i>
+                <span>Effort Level</span>
+              </label>
+              <span id="chat-effort-badge" class="text-[9px] font-mono text-emerald-400">Medium</span>
+            </div>
+            <select
+              id="chat-effort-select"
+              class="w-full bg-[#0c1220] border border-[#1e293b] rounded p-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
+              onchange="handleChatEffortChange()"
+            >
+              <!-- Populated dynamically based on model mapping -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Workspace Selector & Explorer Card -->
+        <div class="bg-[#111728] border border-[#1e293b] rounded-lg p-2.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="folder-code" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Workspace</span>
+            </label>
+            <button
+              onclick="openWorkspaceModal()"
+              class="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 hover:underline transition-colors"
+              title="Switch or create workspace folder"
+            >
+              <i data-lucide="folder-plus" class="w-3 h-3"></i>
+              <span>Switch</span>
+            </button>
+          </div>
+
+          <!-- Active Workspace Path & File count -->
+          <div class="bg-[#0c1220] border border-[#1e293b] rounded p-2 mb-2 flex items-center justify-between">
+            <div class="flex items-center gap-1.5 truncate mr-1">
+              <i data-lucide="folder" class="w-3.5 h-3.5 text-emerald-400 flex-none"></i>
+              <span id="sidebar-workspace-path" class="text-xs font-mono text-slate-200 truncate" title="./workspace">./workspace</span>
+            </div>
+            <span id="sidebar-workspace-count" class="text-[10px] font-mono text-slate-400 flex-none px-1.5 py-0.5 rounded bg-[#151d30]">0 files</span>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex items-center gap-1.5">
+            <button
+              onclick="openWorkspaceExplorerModal()"
+              class="flex-1 py-1 px-2 bg-[#151d30] hover:bg-[#1a253f] text-slate-200 rounded text-[11px] font-medium border border-[#22304d] transition-colors flex items-center justify-center gap-1"
+              title="Browse, view, and create files in this workspace"
+            >
+              <i data-lucide="files" class="w-3 h-3 text-amber-400"></i>
+              <span>Explore Files</span>
+            </button>
+            <button
+              onclick="refreshWorkspaceFiles(true)"
+              class="p-1 text-slate-400 hover:text-slate-200 hover:bg-[#151d30] rounded border border-[#1e293b] transition-colors"
+              title="Refresh workspace files"
+            >
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+            </button>
+          </div>
+
+          <!-- File Tools Toggle -->
+          <div class="mt-2 pt-2 border-t border-[#1a2336] flex items-center justify-between text-[10px]">
+            <label for="chat-tools-toggle" class="text-slate-400 flex items-center gap-1 cursor-pointer select-none">
+              <i data-lucide="wrench" class="w-2.5 h-2.5 text-emerald-400"></i>
+              <span>Enable File Tools</span>
+            </label>
+            <input
+              id="chat-tools-toggle"
+              type="checkbox"
+              checked
+              class="rounded bg-[#0c1220] border-[#1e293b] text-emerald-500 focus:ring-0 cursor-pointer"
+              title="Allow agent to write/read/edit files"
+            />
+          </div>
+        </div>
+
+        <!-- System Prompt (View-Only) -->
+        <div class="bg-[#111728] border border-[#1e293b] rounded-lg p-2.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-3 h-3 text-emerald-400"></i>
+              <span>System Prompt</span>
+            </label>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono">view-only</span>
+          </div>
+          <div id="chat-system-prompt-text" class="bg-[#0c1220] border border-[#1e293b] rounded p-2 text-[11px] text-slate-400 leading-relaxed font-sans select-text">
+            You are a senior enterprise AI assistant specializing in software engineering, technical architecture, and system design.
+          </div>
+        </div>
+
+        <!-- Chat History Threads -->
+        <div class="flex flex-col flex-1">
+          <div class="flex items-center justify-between px-1 mb-1.5">
+            <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Conversations</span>
+            <button onclick="clearAllChatHistory()" class="text-[10px] text-slate-500 hover:text-rose-400 transition-colors" title="Clear all">Clear</button>
+          </div>
+          <div id="chat-threads-list" class="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
+            <!-- Filled dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Gateway Status -->
+      <div class="pt-3 border-t border-[#1e293b] flex items-center justify-between text-[10px] text-slate-400">
+        <div class="flex items-center gap-1.5">
+          <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+          <span class="font-mono">LiteLLM Proxy</span>
+        </div>
+        <span class="text-slate-500 font-mono">v1</span>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT CANVAS -->
+    <main class="flex-1 flex flex-col bg-[#0b0f19] relative overflow-hidden">
+      <!-- Top Chat Sub-Header -->
+      <div class="flex items-center justify-between px-4 py-2 border-b border-[#1e293b] bg-[#0d1222] flex-none">
+        <div class="flex items-center gap-2">
+          <i data-lucide="message-square-text" class="w-4 h-4 text-emerald-400"></i>
+          <span id="chat-active-title" class="text-xs font-semibold text-slate-200 truncate max-w-sm">New Conversation</span>
+          <!-- Chat Random ID pill with 1-click copy -->
+          <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#131b2e] border border-[#22304d] text-[10px] font-mono text-slate-400" title="Chat ID (stored in data/chats/)">
+            <span class="text-slate-500">#</span>
+            <span id="chat-active-id" class="text-indigo-300 font-semibold">c-default</span>
+            <button onclick="copyActiveChatId(this)" class="hover:text-emerald-400 transition-colors p-0.5" title="Copy Chat ID">
+              <i data-lucide="copy" class="w-2.5 h-2.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-share-chat"
+            onclick="openShareChatModal()"
+            class="text-[11px] text-slate-300 hover:text-white px-2.5 py-0.5 rounded bg-[#131b2e] hover:bg-[#1a253f] border border-[#22304d] transition-colors flex items-center gap-1.5"
+            title="Share chat or view disk file location"
+          >
+            <i data-lucide="share-2" class="w-3 h-3 text-indigo-400"></i>
+            <span>Share</span>
+          </button>
+          <span
+            id="chat-header-workspace-badge"
+            onclick="openWorkspaceExplorerModal()"
+            class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/25 text-[10px] font-mono cursor-pointer transition-colors"
+            title="Active Workspace directory (click to explore files)"
+          >
+            <i data-lucide="folder" class="w-3 h-3 text-indigo-400"></i>
+            <span id="chat-header-workspace-name">./workspace</span>
+          </span>
+          <span id="chat-model-badge" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono">
+            google/gemini-3.8-flash
+          </span>
+          <span id="chat-effort-header-badge" class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-mono">
+            Effort: Medium
+          </span>
+          <span id="chat-session-cost-badge" class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#111728] text-emerald-400 border border-emerald-500/30 text-[10px] font-mono" title="Cumulative chat cost from LiteLLM proxy">
+            <i data-lucide="coins" class="w-3 h-3 text-amber-400"></i>
+            <span id="chat-session-cost-val">$0.00</span>
+          </span>
+          <button
+            id="btn-wrap-all"
+            onclick="toggleWrapAllChatMessages()"
+            class="text-[11px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded hover:bg-slate-800 transition-colors flex items-center gap-1"
+            title="Collapse or expand all assistant messages"
+          >
+            <i data-lucide="chevrons-up-down" class="w-3 h-3 text-indigo-400"></i>
+            <span id="btn-wrap-all-text">Collapse All</span>
+          </button>
+          <button
+            onclick="clearCurrentChatMessages()"
+            class="text-[11px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded hover:bg-slate-800 transition-colors"
+            title="Clear Messages"
+          >
+            Clear Messages
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Stream Area -->
+      <div id="chat-messages-container" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 w-full">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Bottom Chat Input Bar -->
+      <div class="p-3 bg-[#0d1222] border-t border-[#1e293b] flex-none">
+        <div class="max-w-4xl mx-auto bg-[#111728] border border-[#1e293b] rounded-xl p-2 shadow-xl focus-within:border-indigo-500/60 transition-colors">
+          <textarea
+            id="chat-user-input"
+            rows="2"
+            placeholder="Ask anything or request technical analysis... (Press Enter to send, Shift+Enter for newline)"
+            class="w-full bg-transparent border-0 text-xs text-slate-100 placeholder-slate-500 focus:outline-none resize-none px-2 py-1 leading-relaxed font-sans"
+            onkeydown="handleChatKeyDown(event)"
+            oninput="handleChatInputTyping()"
+          ></textarea>
+
+          <div class="flex items-center justify-between pt-2 border-t border-[#1a2336] px-1">
+            <div class="flex items-center gap-2 text-[10px] text-slate-400">
+              <span class="flex items-center gap-1 font-mono">
+                <i data-lucide="corner-down-left" class="w-2.5 h-2.5"></i> Enter to send
+              </span>
+              <span>·</span>
+              <!-- Theoretic Token Counter Pill for next turn -->
+              <span id="input-token-counter" class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#0c1220] border border-[#1e293b] text-slate-300 font-mono text-[10px]" title="Theoretic token count for next turn (queried at 2s interval from LiteLLM proxy)">
+                <i data-lucide="gauge" class="w-3 h-3 text-indigo-400"></i>
+                <span id="input-token-text">~0 tokens (next turn)</span>
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button
+                id="btn-chat-stop"
+                onclick="stopChatStreaming()"
+                class="hidden flex items-center gap-1 px-2.5 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs transition-colors"
+              >
+                <i data-lucide="square" class="w-3 h-3 fill-current"></i>
+                <span>Stop</span>
+              </button>
+
+              <button
+                id="btn-chat-send"
+                onclick="sendChatMessage()"
+                class="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-semibold rounded-lg text-xs transition-all shadow-md active:scale-95"
+              >
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span>Send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODE 2: WORKFLOW MODE CONTAINER                                           -->
+  <!-- ========================================================================= -->
+  <div id="container-workflow" class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- STATE 1: OPEN TICKET / EMPTY TAB VIEW -->
+    <div id="view-empty-tab" class="hidden flex-1 flex flex-col items-center justify-center bg-[#0b0f19] p-4">
+      <div class="w-full max-w-md bg-[#0e1424] border border-[#1e293b] rounded-xl p-6 shadow-2xl text-center">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3 text-left">Open an existing ticket</h3>
+        
+        <div class="flex items-center gap-2 mb-4">
+          <input
+            id="input-ticket-search"
+            type="text"
+            value="SMS-22220"
+            placeholder="SMS-1234"
+            class="flex-1 bg-[#151d30] border border-[#22304d] rounded-md px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/60 font-mono"
+          />
+          <button
+            onclick="handleOpenExistingTicket()"
+            class="flex items-center gap-1.5 px-4 py-2 bg-slate-200 hover:bg-white text-slate-950 rounded-md text-xs font-semibold transition-colors shadow-sm"
+          >
+            <i data-lucide="folder-open" class="w-3.5 h-3.5 text-slate-900"></i>
+            <span>Open</span>
+          </button>
+        </div>
+
+        <div class="relative flex items-center justify-center my-4">
+          <div class="w-full border-t border-[#1e293b]"></div>
+          <span class="absolute px-3 bg-[#0e1424] text-[11px] text-slate-500 font-medium">or</span>
+        </div>
+
+        <button
+          onclick="handleCreateNewProject()"
+          class="w-full py-2 bg-[#131b2e] hover:bg-[#1a253f] text-slate-300 border border-[#22304d] rounded-md text-xs font-medium transition-colors mb-2 flex items-center justify-center gap-1.5"
+        >
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>+ New project</span>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center">
+          Gathers requirements and creates a new ticket for this tab.
+        </p>
+      </div>
+    </div>
+
+    <!-- ACTIVE TICKET DETAILS BANNER -->
+    <div id="ticket-banner" class="flex items-center justify-between px-4 py-2 bg-[#0e1424] border-b border-[#1e293b] flex-none">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span id="banner-code" class="text-emerald-400 font-bold text-xs tracking-wide mono-font">SMS-22220:</span>
+        <span id="banner-title" class="text-slate-200 text-xs font-medium">[ALB/Theory] SMEPLN22003BL09 シーズン別事業別チャネル別G部門別前期売上実績</span>
+
+        <div id="banner-tags" class="flex items-center gap-1.5 ml-2">
+          <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/50">CR</span>
+          <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-700/50">In Progress</span>
+          <span class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+            <i data-lucide="pin" class="w-2.5 h-2.5 rotate-45"></i> pin
+          </span>
+        </div>
+      </div>
+
+      <button onclick="loadWorkflow(activeTicketId)" class="text-slate-400 hover:text-slate-200 p-1 hover:bg-slate-800 rounded transition-colors" title="Reload Ticket">
+        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+
+    <!-- STATE 2: OVERVIEW MODE (HORIZONTAL PIPELINE ACROSS TOP) -->
+    <div id="view-overview" class="flex-1 flex flex-col overflow-y-auto">
+      <!-- Horizontal Stepper Row -->
+      <div class="border-b border-[#1e293b] bg-[#0c1220] px-4 pt-3 pb-2 flex-none">
+        <div class="flex items-center justify-between gap-4 mb-2">
+          <!-- Sub-tasks counter pill -->
+          <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#151d30] border border-indigo-500/30 text-xs text-indigo-300">
+            <div class="w-3 h-3 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin"></div>
+            <span class="font-medium mono-font text-[11px]">2/5 sub-tasks</span>
+          </div>
+
+          <!-- Horizontal Stepper Nodes -->
+          <div id="horizontal-pipeline-nodes" class="flex-1 flex items-center justify-center max-w-4xl relative">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Guide button -->
+          <button class="flex flex-col items-center text-slate-400 hover:text-slate-200 transition-colors p-1">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span class="text-[9px] tracking-wider uppercase font-semibold mt-0.5">Guide</span>
+          </button>
+        </div>
+
+        <!-- Active Stage Subtask Card -->
+        <div class="mt-2 bg-[#111728] border border-[#1e293b] rounded-lg p-2.5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span id="overview-subcard-title" class="text-xs font-semibold text-slate-200">Design</span>
+              <span id="overview-subcard-badge" class="text-[10px] px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium">active</span>
+            </div>
+            <span id="overview-subcard-count" class="text-xs text-slate-400 mono-font">0/2</span>
+          </div>
+
+          <div class="bg-[#0e1424] border border-[#1a2336] rounded p-2.5">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span id="overview-subcard-code" class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono font-medium border border-emerald-500/30">SMS-23005</span>
+              <span id="overview-subcard-status" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">To Do</span>
+            </div>
+
+            <p id="overview-subcard-desc" class="text-xs text-slate-300 font-medium mb-2.5">
+              [Design] Write spec: Batch — SMEPLN22003BL09 previous year sales actuals by channel
+            </p>
+
+            <!-- Stepper Nodes Flow -->
+            <div id="overview-subcard-stepper" class="flex items-center gap-3 pt-0.5 overflow-x-auto text-xs">
+              <!-- Clickable subtask nodes render here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty / Resting background canvas for overview -->
+      <div class="flex-1 bg-[#090d16]"></div>
+    </div>
+
+    <!-- STATE 3: EXECUTION / CONSOLE MODE (SPLIT LEFT PIPELINE + RIGHT CONSOLE) -->
+    <div id="view-execution" class="hidden flex-1 flex overflow-hidden">
+      
+      <!-- LEFT SIDEBAR: VERTICAL PIPELINE & MINI SUBCARD -->
+      <aside class="w-72 bg-[#0c1220] border-r border-[#1e293b] flex flex-col justify-between p-3 flex-none overflow-y-auto">
+        <div>
+          <!-- Top header with counter & guide -->
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e293b]">
+            <div class="flex items-center gap-1.5 text-xs text-indigo-300 font-medium">
+              <div class="w-2.5 h-2.5 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin"></div>
+              <span class="mono-font text-[11px]">2/5 sub-tasks</span>
+            </div>
+            <button class="text-slate-400 hover:text-slate-200 transition-colors p-1" title="Guide">
+              <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Vertical Stepper List -->
+          <div id="vertical-pipeline-nodes" class="flex flex-col gap-1.5">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Mini Active Subtask Card on bottom left -->
+        <div id="sidebar-mini-card" class="mt-4 pt-3 border-t border-[#1e293b]">
+          <!-- Dynamically populated -->
+        </div>
+      </aside>
+
+      <!-- RIGHT MAIN: EXECUTION CONSOLE -->
+      <main class="flex-1 flex flex-col bg-[#0b0f19] overflow-hidden">
+        <!-- Top Phase Control Strip -->
+        <div class="flex items-center justify-between px-4 py-2 border-b border-[#1e293b] bg-[#0d1222] flex-none">
+          <div>
+            <h2 id="exec-title" class="text-xs font-semibold text-slate-100 flex items-center gap-2">
+              Write Spec
+            </h2>
+            <p id="exec-subtitle" class="text-[10px] text-slate-400 truncate max-w-xl">
+              SMS-23005: [Design] Write spec: Batch — SMEPLN22003BL09 previous year sales actuals by channel
+            </p>
+          </div>
+
+          <!-- Action buttons right -->
+          <div class="flex items-center gap-2 text-xs">
+            <!-- Context toggle button -->
+            <button id="btn-context" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#151d30] hover:bg-[#1a253e] border border-slate-700/60 text-slate-300 text-[11px] transition-colors">
+              <i data-lucide="database" class="w-3 h-3 text-indigo-400"></i>
+              <span id="context-label">Context loaded</span>
+              <span id="context-status" class="text-emerald-400 text-[10px] font-mono">ready (4.2 kB) →</span>
+            </button>
+
+            <!-- Complete stage toggle -->
+            <button class="flex items-center gap-1 px-2.5 py-1 rounded bg-[#151d30] hover:bg-[#1a253e] border border-slate-700/60 text-slate-300 text-[11px] transition-colors">
+              <i data-lucide="check" class="w-3 h-3 text-emerald-400"></i>
+              <span>Complete</span>
+            </button>
+
+            <!-- Close console to return to Overview -->
+            <button onclick="closeExecutionMode()" class="text-slate-400 hover:text-slate-200 p-1 hover:bg-slate-800 rounded transition-colors" title="Back to Overview">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Preset Command Bar -->
+        <div class="px-4 py-1.5 bg-[#0a0e17] border-b border-[#151d30] flex items-center gap-2 flex-none">
+          <span class="text-[11px] text-indigo-400 font-mono">Preset:</span>
+          <input
+            id="preset-prompt-input"
+            type="text"
+            readonly
+            value="/dev-design spec-creation SMS-23005"
+            class="flex-1 bg-transparent border-0 text-[11px] text-slate-300 font-mono focus:outline-none select-all"
+          />
+          <button class="text-[10px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded bg-slate-800/60 transition-colors">
+            Copy
+          </button>
+        </div>
+
+        <!-- Model, Effort & Sessions Row -->
+        <div class="flex items-center justify-between px-4 py-2 border-b border-[#1e293b] bg-[#0c1220] flex-none text-xs">
+          <div class="flex items-center gap-3">
+            <!-- Model Dropdown -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-400 text-[11px]">Model:</span>
+              <select id="model-select" class="bg-[#151d30] border border-[#22304d] rounded px-2 py-1 text-[11px] text-slate-200 focus:outline-none focus:border-indigo-500 font-mono">
+                <!-- Dynamically populated from /api/models -->
+              </select>
+            </div>
+
+            <!-- Effort Dropdown -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-400 text-[11px]">Effort:</span>
+              <select id="effort-select" class="bg-[#151d30] border border-[#22304d] rounded px-2 py-1 text-[11px] text-slate-200 focus:outline-none focus:border-indigo-500">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Sessions & Cost indicator -->
+          <div class="flex items-center gap-2 text-[11px]">
+            <span class="text-slate-400">Sessions</span>
+            <span class="text-slate-500">|</span>
+            <span id="session-badge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px]">#1</span>
+            <span id="session-cost" class="text-emerald-400 font-mono text-[11px] font-semibold">$1.246</span>
+            <button class="text-slate-500 hover:text-slate-300 p-0.5 ml-1">
+              <i data-lucide="maximize-2" class="w-3 h-3"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Terminal / Streaming Canvas Body -->
+        <div id="exec-canvas" class="flex-1 p-4 overflow-y-auto bg-[#090d16] font-mono text-xs">
+          <!-- Ready Placeholder / Initial State -->
+          <div id="ready-placeholder" class="h-full flex flex-col items-center justify-center text-center text-slate-500">
+            <div class="w-12 h-12 rounded-full bg-[#111728] border border-[#1e293b] flex items-center justify-center mb-3 text-slate-400">
+              <i data-lucide="terminal" class="w-6 h-6"></i>
+            </div>
+            <p class="text-xs font-medium text-slate-400">Execution console ready</p>
+            <p class="text-[11px] text-slate-600 mt-1 max-w-sm">
+              Press <b>Start</b> below to run the agent turn using the preset prompt and context.
+            </p>
+          </div>
+
+          <!-- Real-Time SSE Stream Content Output -->
+          <div id="stream-content" class="hidden flex flex-col gap-2">
+            <!-- Chunks and status cards will be appended here -->
+          </div>
+        </div>
+
+        <!-- Bottom Prompt Bar & Start Execution Button -->
+        <div class="p-3 bg-[#0d1222] border-t border-[#1e293b] flex-none">
+          <div class="flex items-center gap-2 bg-[#111728] border border-[#1e293b] rounded-lg p-1.5 focus-within:border-indigo-500/60 transition-colors">
+            <input
+              id="additional-input"
+              type="text"
+              placeholder="Additional prompt instructions or context... (Optional)"
+              class="flex-1 bg-transparent border-0 text-xs text-slate-200 placeholder-slate-500 focus:outline-none px-2 font-sans"
+            />
+            
+            <button
+              id="btn-start"
+              class="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-semibold rounded-md text-xs transition-all shadow-sm active:scale-95 flex-none"
+            >
+              <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+              <span>Start</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SHARE CHAT & DISK STORAGE MODAL                                           -->
+  <!-- ========================================================================= -->
+  <div id="modal-share-chat" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0e1424] border border-[#1e293b] rounded-xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-[#1a2336] pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="share-2" class="w-4 h-4 text-emerald-400"></i>
+          <h3 class="text-sm font-semibold text-slate-200">Share Chat & Disk Location</h3>
+        </div>
+        <button onclick="closeShareChatModal()" class="text-slate-400 hover:text-slate-200 p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="text-[11px] text-slate-400 font-medium block mb-1">Random Chat ID</label>
+          <div class="flex items-center gap-2">
+            <input id="modal-share-id" readonly class="flex-1 bg-[#131b2e] border border-[#22304d] rounded px-3 py-1.5 text-indigo-300 font-mono text-xs focus:outline-none" />
+            <button onclick="copyModalField('modal-share-id', this)" class="px-3 py-1.5 bg-[#1a253f] hover:bg-[#22304d] text-slate-200 rounded font-medium border border-[#2a3c63] transition-colors flex items-center gap-1">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-medium block mb-1">Stored On Disk (Shareable File)</label>
+          <div class="flex items-center gap-2">
+            <input id="modal-share-path" readonly class="flex-1 bg-[#131b2e] border border-[#22304d] rounded px-3 py-1.5 text-emerald-400 font-mono text-xs focus:outline-none" />
+            <button onclick="copyModalField('modal-share-path', this)" class="px-3 py-1.5 bg-[#1a253f] hover:bg-[#22304d] text-slate-200 rounded font-medium border border-[#2a3c63] transition-colors flex items-center gap-1">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copy Path</span>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-500 mt-1">This JSON file is stored under <code class="text-slate-400 font-mono">data/chats/</code> on disk and contains the full prompt, token counts, and cost history.</p>
+        </div>
+
+        <div class="pt-2 flex items-center gap-2 border-t border-[#1a2336]">
+          <button onclick="copyFullChatJson(this)" class="flex-1 py-2 bg-[#131b2e] hover:bg-[#1a253f] text-slate-200 border border-[#22304d] rounded-lg font-medium transition-colors flex items-center justify-center gap-1.5">
+            <i data-lucide="file-json" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Copy Full JSON</span>
+          </button>
+          <button onclick="downloadChatJson()" class="flex-1 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-lg font-medium transition-colors flex items-center justify-center gap-1.5">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download .json</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- WORKSPACE MANAGER MODAL (SWITCH / CREATE WORKSPACE)                       -->
+  <!-- ========================================================================= -->
+  <div id="modal-workspace-manager" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0e1424] border border-[#1e293b] rounded-xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-[#1a2336] pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="folder-code" class="w-4 h-4 text-indigo-400"></i>
+          <h3 class="text-sm font-semibold text-slate-200">Select or Create Workspace</h3>
+        </div>
+        <button onclick="closeWorkspaceModal()" class="text-slate-400 hover:text-slate-200 p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="text-[11px] text-slate-400 font-medium block mb-1">Available Workspaces</label>
+          <div id="workspace-manager-list" class="space-y-1.5 max-h-48 overflow-y-auto">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-[#1a2336]">
+          <label class="text-[11px] text-slate-400 font-medium block mb-1">Create New Workspace Folder</label>
+          <div class="flex items-center gap-2">
+            <input
+              id="input-new-workspace-name"
+              type="text"
+              placeholder="e.g. project-frontend or payment-service"
+              class="flex-1 bg-[#131b2e] border border-[#22304d] rounded px-3 py-1.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500/60"
+            />
+            <button
+              onclick="createNewWorkspace()"
+              class="px-3.5 py-1.5 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-semibold rounded text-xs transition-colors shadow-sm flex items-center gap-1"
+            >
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Create</span>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-500 mt-1">Creates a new folder inside <code class="text-slate-400 font-mono">./workspace/</code></p>
+        </div>
+
+        <div class="pt-2 border-t border-[#1a2336]">
+          <label class="text-[11px] text-slate-400 font-medium block mb-1">Or Enter Custom Path</label>
+          <div class="flex items-center gap-2">
+            <input
+              id="input-custom-workspace-path"
+              type="text"
+              placeholder="./workspace or custom directory"
+              class="flex-1 bg-[#131b2e] border border-[#22304d] rounded px-3 py-1.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500/60"
+            />
+            <button
+              onclick="applyCustomWorkspacePath()"
+              class="px-3.5 py-1.5 bg-[#1a253f] hover:bg-[#22304d] text-slate-200 font-medium rounded text-xs border border-[#2a3c63] transition-colors"
+            >
+              Set Active
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- WORKSPACE EXPLORER & FILE VIEWER MODAL                                    -->
+  <!-- ========================================================================= -->
+  <div id="modal-workspace-explorer" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0e1424] border border-[#1e293b] rounded-xl max-w-4xl w-full h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-5 py-3 border-b border-[#1a2336] bg-[#0c1220] flex-none">
+        <div class="flex items-center gap-2">
+          <i data-lucide="folder-open" class="w-4 h-4 text-emerald-400"></i>
+          <h3 class="text-sm font-semibold text-slate-200">Workspace Files</h3>
+          <span id="explorer-active-path" class="text-[11px] font-mono text-indigo-300 px-2 py-0.5 rounded bg-[#151d30] border border-[#22304d]">./workspace</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            onclick="openWorkspaceModal()"
+            class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline px-2 py-1 rounded bg-[#131b2e] border border-[#22304d] flex items-center gap-1"
+          >
+            <i data-lucide="folder-plus" class="w-3 h-3"></i>
+            <span>Switch Folder</span>
+          </button>
+          <button onclick="closeWorkspaceExplorerModal()" class="text-slate-400 hover:text-slate-200 p-1">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Split Left File Tree + Right File Content/Editor) -->
+      <div class="flex-1 flex overflow-hidden">
+        <!-- Left: File List -->
+        <div class="w-72 bg-[#090e1a] border-r border-[#1a2336] flex flex-col p-3 overflow-y-auto flex-none">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1a2336]">
+            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Files & Folders</span>
+            <div class="flex items-center gap-1">
+              <button
+                onclick="promptNewWorkspaceFile()"
+                class="p-1 text-emerald-400 hover:text-emerald-300 hover:bg-[#151d30] rounded transition-colors"
+                title="Create New File"
+              >
+                <i data-lucide="file-plus" class="w-3.5 h-3.5"></i>
+              </button>
+              <button
+                onclick="refreshWorkspaceFiles(true)"
+                class="p-1 text-slate-400 hover:text-slate-200 hover:bg-[#151d30] rounded transition-colors"
+                title="Refresh File List"
+              >
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="explorer-file-tree" class="flex flex-col gap-1 text-xs font-mono">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Right: File Preview & Editor -->
+        <div class="flex-1 flex flex-col bg-[#0b0f19] overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-[#1a2336] bg-[#0c1220] flex-none">
+            <div class="flex items-center gap-2">
+              <i data-lucide="file-code" class="w-4 h-4 text-indigo-400"></i>
+              <input
+                id="explorer-current-filepath"
+                type="text"
+                placeholder="Select or create a file..."
+                class="bg-transparent border-0 text-xs font-mono text-slate-200 focus:outline-none w-80 truncate"
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                id="btn-delete-workspace-file"
+                onclick="deleteCurrentActiveFile()"
+                class="hidden text-[11px] text-rose-400 hover:text-rose-300 px-2.5 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors flex items-center gap-1"
+                title="Delete this file"
+              >
+                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <span>Delete</span>
+              </button>
+              <button
+                id="btn-save-workspace-file"
+                onclick="saveCurrentActiveFile()"
+                class="text-[11px] px-3 py-1 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-semibold rounded transition-colors flex items-center gap-1 shadow-sm"
+              >
+                <i data-lucide="save" class="w-3 h-3"></i>
+                <span>Save File</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 relative flex flex-col overflow-hidden p-2">
+            <textarea
+              id="explorer-file-content"
+              placeholder="File content will appear here when selected..."
+              class="flex-1 w-full bg-[#080c14] border border-[#1a2336] rounded p-3 text-xs font-mono text-slate-200 focus:outline-none resize-none leading-relaxed"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- APPLICATION LOGIC & STATE ENGINE                                          -->
+  <!-- ========================================================================= -->
+  <script>
+    // ----------------- GLOBAL APP STATE -----------------
+    let currentAppMode = 'workflow'; // 'chat' or 'workflow'
+    let availableModels = [];
+
+    // Workflow State
+    let tickets = [];
+    let activeTicketId = "SMS-22220";
+    let activeStageId = "DESIGN";
+    let workflow = null;
+    let isExecutionView = false;
+    let contextLoaded = true;
+    let isExecuting = false;
+
+    // Chat State
+    let activeChatThreadId = null;
+    let chatThreads = [];
+    let isChatStreaming = false;
+    let chatAbortController = null;
+    let modelEffortMap = {
+      // Google Enterprise Agent Platform (Gemini Models)
+      "google/gemini-3.8-flash": ["Low", "Medium", "High"],
+      "google/gemini-3.5-flash": ["Low", "Medium", "High"],
+      "google/gemini-3.1-pro-preview": ["Low", "Medium", "High"],
+      "google/gemini-3.1-flash-lite": [],
+      "google/gemini-4-argon": ["Low", "Medium", "High"],
+
+      // Anthropic Claude Models
+      "claude-sonnet-5-5": ["Low", "Medium", "High"],
+      "claude-sonnet-5": ["Low", "Medium", "High"],
+      "claude-opus-5-5": ["Low", "Medium", "High"],
+      "claude-opus-5": ["Low", "Medium", "High"],
+      "claude-haiku-5-5": [],
+      "claude-haiku-4-5-20251001": [],
+
+      // DeepSeek Models (DeepSeek V4 models only have Low, High effort)
+      "deepseek/deepseek-v4-pro": ["Low", "High"],
+      "deepseek/deepseek-v4-flash": ["Low", "High"],
+      "deepseek/deepseek-V3.2": [],
+
+      // OpenAI Models
+      "gpt-5.5": ["Low", "Medium", "High"],
+      "gpt-5.4-mini": ["Low", "Medium", "High"],
+      "o4-mini": ["Low", "Medium", "High"],
+    };
+
+    const STAGE_ICONS = {
+      REQ: 'file-text',
+      PLAN: 'clipboard-list',
+      DESIGN: 'pen-tool',
+      IMPL: 'code-2',
+      E2E: 'check-square',
+      DEPLOY: 'rocket',
+      WRAP: 'flag'
+    };
+
+    // =========================================================================
+    // THEME SWITCHER LOGIC (HIGH-CONTRAST DARK & CRISP LIGHT)
+    // =========================================================================
+    function initAppTheme() {
+      const savedTheme = localStorage.getItem('preferred_theme') || 'dark';
+      applyAppTheme(savedTheme);
+    }
+
+    function toggleAppTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      localStorage.setItem('preferred_theme', newTheme);
+      applyAppTheme(newTheme);
+    }
+
+    function applyAppTheme(theme) {
+      const isDark = (theme === 'dark');
+      const root = document.documentElement;
+      const icon = document.getElementById('theme-toggle-icon');
+      const text = document.getElementById('theme-toggle-text');
+
+      if (isDark) {
+        root.classList.add('dark');
+        if (icon) {
+          icon.setAttribute('data-lucide', 'sun');
+          icon.className = 'w-3.5 h-3.5 text-amber-400';
+        }
+        if (text) text.innerText = 'Light Mode';
+      } else {
+        root.classList.remove('dark');
+        if (icon) {
+          icon.setAttribute('data-lucide', 'moon');
+          icon.className = 'w-3.5 h-3.5 text-indigo-500';
+        }
+        if (text) text.innerText = 'Dark Mode';
+      }
+
+      if (window.lucide && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+
+    // =========================================================================
+    // 1. INITIALIZATION & DATA LOADING
+    // =========================================================================
+    async function init() {
+      initAppTheme();
+      try {
+        const [tRes, mRes, efRes] = await Promise.all([
+          fetch('/api/tickets'),
+          fetch('/api/models'),
+          fetch('/api/models/effort-map')
+        ]);
+        if (tRes.ok) tickets = await tRes.json();
+        if (efRes && efRes.ok) {
+          try {
+            modelEffortMap = await efRes.json();
+          } catch (e) {}
+        }
+        if (mRes.ok) {
+          availableModels = await mRes.json();
+          renderWorkflowModels(availableModels);
+          renderChatModels(availableModels);
+        }
+
+        // Restore chat threads from localStorage
+        initChatThreads();
+
+        // Initialize Workspaces & File explorer
+        initWorkspaces();
+
+        // Restore preferred mode from localStorage if set
+        const savedMode = localStorage.getItem('preferred_app_mode') || 'workflow';
+        switchAppMode(savedMode);
+
+        renderTabs();
+        loadWorkflow(activeTicketId);
+      } catch (e) {
+        console.error("Init error:", e);
+      }
+    }
+
+    // =========================================================================
+    // 2. MODE SWITCHER LOGIC (CHAT vs WORKFLOW)
+    // =========================================================================
+    function switchAppMode(mode) {
+      currentAppMode = mode;
+      localStorage.setItem('preferred_app_mode', mode);
+
+      const btnChat = document.getElementById('btn-mode-chat');
+      const btnWorkflow = document.getElementById('btn-mode-workflow');
+      const containerChat = document.getElementById('container-chat');
+      const containerWorkflow = document.getElementById('container-workflow');
+      const ticketTabsStrip = document.getElementById('ticket-tabs-strip');
+
+      if (mode === 'chat') {
+        // Activate Chat Mode
+        containerChat.classList.remove('hidden');
+        containerWorkflow.classList.add('hidden');
+        ticketTabsStrip.classList.add('hidden');
+
+        btnChat.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm font-semibold";
+        btnWorkflow.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all text-slate-400 hover:text-slate-200 border border-transparent";
+
+        renderCurrentChatMessages();
+      } else {
+        // Activate Workflow Mode
+        containerChat.classList.add('hidden');
+        containerWorkflow.classList.remove('hidden');
+        ticketTabsStrip.classList.remove('hidden');
+
+        btnWorkflow.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm font-semibold";
+        btnChat.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all text-slate-400 hover:text-slate-200 border border-transparent";
+      }
+
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // 3. CHAT MODE LOGIC & RENDERING
+    // =========================================================================
+    function getModelAllowedEfforts(modelName) {
+      if (!modelName) return [];
+      if (modelEffortMap[modelName] !== undefined) {
+        return modelEffortMap[modelName];
+      }
+      const lower = modelName.toLowerCase();
+      if (lower.includes('haiku') || lower.includes('flash-lite') || lower.includes('v3.2')) {
+        return [];
+      }
+      if (lower.includes('deepseek-v4')) {
+        return ["Low", "High"];
+      }
+      if (lower.includes('gemini') || lower.includes('claude') || lower.includes('gpt') || lower.includes('o4') || lower.includes('o1')) {
+        return ["Low", "Medium", "High"];
+      }
+      return ["Low", "Medium", "High"];
+    }
+
+    function updateChatEffortUI(modelName) {
+      const allowed = getModelAllowedEfforts(modelName);
+      const select = document.getElementById('chat-effort-select');
+      const badge = document.getElementById('chat-effort-badge');
+      const headerBadge = document.getElementById('chat-effort-header-badge');
+
+      if (!select) return;
+
+      if (!allowed || allowed.length === 0) {
+        select.innerHTML = '<option value="" disabled selected>Not Configurable (Fixed)</option>';
+        select.disabled = true;
+        select.classList.add('opacity-50', 'cursor-not-allowed');
+        if (badge) {
+          badge.innerText = 'None';
+          badge.className = 'text-[9px] font-mono text-slate-500';
+        }
+        if (headerBadge) {
+          headerBadge.classList.add('hidden');
+        }
+      } else {
+        select.disabled = false;
+        select.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        const defaultChoice = allowed.includes("Medium") ? "Medium" : (allowed.includes("High") ? "High" : allowed[0]);
+
+        select.innerHTML = allowed.map(ef => `
+          <option value="${ef}" ${ef === defaultChoice ? 'selected' : ''}>${ef}</option>
+        `).join('');
+
+        if (badge) {
+          badge.innerText = defaultChoice;
+          badge.className = 'text-[9px] font-mono text-emerald-400';
+        }
+        if (headerBadge) {
+          headerBadge.classList.remove('hidden');
+          headerBadge.innerText = `Effort: ${defaultChoice}`;
+        }
+      }
+    }
+
+    function handleChatEffortChange() {
+      const select = document.getElementById('chat-effort-select');
+      const val = select.disabled ? null : select.value;
+      const badge = document.getElementById('chat-effort-badge');
+      const headerBadge = document.getElementById('chat-effort-header-badge');
+
+      if (badge) {
+        badge.innerText = val || 'None';
+        badge.className = val ? 'text-[9px] font-mono text-emerald-400' : 'text-[9px] font-mono text-slate-500';
+      }
+      if (headerBadge) {
+        if (val) {
+          headerBadge.classList.remove('hidden');
+          headerBadge.innerText = `Effort: ${val}`;
+        } else {
+          headerBadge.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderChatModels(models) {
+      const select = document.getElementById('chat-model-select');
+      select.innerHTML = models.map(m => `
+        <option value="${m}" ${m.includes('gemini-3.8') ? 'selected' : ''}>
+          ${m}
+        </option>
+      `).join('');
+      updateChatModelBadge();
+      updateChatEffortUI(select.value);
+    }
+
+    function handleChatModelChange() {
+      const val = document.getElementById('chat-model-select').value;
+      updateChatModelBadge();
+      updateChatEffortUI(val);
+      checkAndFetchTheoreticTokens(true);
+    }
+
+    function updateChatModelBadge() {
+      const val = document.getElementById('chat-model-select').value;
+      const badge = document.getElementById('chat-model-badge');
+      if (badge && val) {
+        badge.innerText = val;
+      }
+    }
+
+    function generateRandomChatId() {
+      const chars = '0123456789abcdef';
+      let r1 = '', r2 = '';
+      for (let i = 0; i < 4; i++) r1 += chars[Math.floor(Math.random() * chars.length)];
+      for (let i = 0; i < 4; i++) r2 += chars[Math.floor(Math.random() * chars.length)];
+      return `c-${r1}-${r2}`;
+    }
+
+    function getNextChatTitle() {
+      let highestNum = 0;
+      const regex = /^New Chat (\d+)$/i;
+      for (const th of chatThreads) {
+        if (th && th.title) {
+          const match = th.title.trim().match(regex);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (!isNaN(num) && num > highestNum) {
+              highestNum = num;
+            }
+          }
+        }
+      }
+      return `New Chat ${highestNum + 1}`;
+    }
+
+    async function initChatThreads() {
+      let loadedFromDisk = false;
+      try {
+        const res = await fetch('/api/chats');
+        if (res.ok) {
+          const diskChats = await res.json();
+          if (diskChats && diskChats.length > 0) {
+            const loaded = [];
+            for (const dc of diskChats.slice(0, 20)) {
+              try {
+                const r = await fetch(`/api/chats/${dc.id}`);
+                if (r.ok) {
+                  loaded.push(await r.json());
+                }
+              } catch (e) {}
+            }
+            if (loaded.length > 0) {
+              chatThreads = loaded;
+              loadedFromDisk = true;
+            }
+          }
+        }
+      } catch (e) {}
+
+      if (!loadedFromDisk) {
+        const stored = localStorage.getItem('ai_chat_threads');
+        if (stored) {
+          try {
+            chatThreads = JSON.parse(stored);
+          } catch (e) {
+            chatThreads = [];
+          }
+        }
+      }
+
+      if (!chatThreads || chatThreads.length === 0) {
+        const defaultTitle = getNextChatTitle();
+        const defaultThread = {
+          id: generateRandomChatId(),
+          title: defaultTitle,
+          createdAt: new Date().toISOString(),
+          messages: []
+        };
+        chatThreads = [defaultThread];
+        activeChatThreadId = defaultThread.id;
+        saveChatThreads();
+      } else {
+        activeChatThreadId = chatThreads[0].id;
+      }
+
+      renderChatThreadsList();
+      renderCurrentChatMessages();
+      updateChatSessionCostBadge();
+    }
+
+    function saveChatThreads() {
+      localStorage.setItem('ai_chat_threads', JSON.stringify(chatThreads));
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (cur) {
+        syncChatToDisk(cur);
+      }
+    }
+
+    async function syncChatToDisk(chat) {
+      try {
+        await fetch(`/api/chats/${chat.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...chat,
+            updatedAt: new Date().toISOString()
+          })
+        });
+      } catch (e) {
+        console.warn('Sync to disk error:', e);
+      }
+    }
+
+    function renderChatThreadsList() {
+      const container = document.getElementById('chat-threads-list');
+      container.innerHTML = chatThreads.map(th => {
+        const isActive = th.id === activeChatThreadId;
+        return `
+          <div
+            onclick="selectChatThread('${th.id}')"
+            class="group flex items-center justify-between px-2.5 py-1.5 rounded-md cursor-pointer transition-colors text-xs ${
+              isActive ? 'bg-[#151d30] text-emerald-400 font-medium border border-emerald-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-[#111726]'
+            }"
+          >
+            <div class="flex items-center gap-1.5 truncate">
+              <i data-lucide="message-square" class="w-3 h-3 flex-none ${isActive ? 'text-emerald-400' : 'text-slate-500'}"></i>
+              <span class="truncate">${th.title}</span>
+            </div>
+            <button
+              onclick="event.stopPropagation(); deleteChatThread('${th.id}')"
+              class="opacity-0 group-hover:opacity-100 hover:text-rose-400 transition-opacity p-0.5"
+              title="Delete chat"
+            >
+              <i data-lucide="trash-2" class="w-3 h-3"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function selectChatThread(threadId) {
+      activeChatThreadId = threadId;
+      renderChatThreadsList();
+      renderCurrentChatMessages();
+      updateChatSessionCostBadge();
+      checkAndFetchTheoreticTokens(true);
+    }
+
+    function startNewChat() {
+      const newTitle = getNextChatTitle();
+      const newThread = {
+        id: generateRandomChatId(),
+        title: newTitle,
+        createdAt: new Date().toISOString(),
+        messages: []
+      };
+      chatThreads.unshift(newThread);
+      activeChatThreadId = newThread.id;
+      saveChatThreads();
+      renderChatThreadsList();
+      renderCurrentChatMessages();
+      updateChatSessionCostBadge();
+      checkAndFetchTheoreticTokens(true);
+      document.getElementById('chat-user-input').focus();
+    }
+
+    function deleteChatThread(threadId) {
+      fetch(`/api/chats/${threadId}`, { method: 'DELETE' }).catch(() => {});
+      if (chatThreads.length <= 1) {
+        const th = chatThreads.find(t => t.id === threadId);
+        if (th) {
+          th.title = 'New Chat 1';
+          th.messages = [];
+          saveChatThreads();
+          renderChatThreadsList();
+          renderCurrentChatMessages();
+          updateChatSessionCostBadge();
+        }
+        return;
+      }
+      chatThreads = chatThreads.filter(t => t.id !== threadId);
+      if (activeChatThreadId === threadId) {
+        activeChatThreadId = chatThreads[0].id;
+      }
+      saveChatThreads();
+      renderChatThreadsList();
+      renderCurrentChatMessages();
+      updateChatSessionCostBadge();
+    }
+
+    function clearAllChatHistory() {
+      if (!confirm('Clear all chat conversation history?')) return;
+      chatThreads.forEach(t => {
+        fetch(`/api/chats/${t.id}`, { method: 'DELETE' }).catch(() => {});
+      });
+      chatThreads = [];
+      localStorage.removeItem('ai_chat_threads');
+      initChatThreads();
+      renderCurrentChatMessages();
+    }
+
+    function clearCurrentChatMessages() {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (cur) {
+        cur.messages = [];
+        saveChatThreads();
+        renderChatThreadsList();
+        renderCurrentChatMessages();
+        updateChatSessionCostBadge();
+        checkAndFetchTheoreticTokens(true);
+      }
+    }
+
+    function copyActiveChatId(btn) {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (!cur) return;
+      navigator.clipboard.writeText(cur.id);
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="check" class="w-2.5 h-2.5 text-emerald-400"></i>`;
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = origHtml;
+        lucide.createIcons();
+      }, 1500);
+    }
+
+    function openShareChatModal() {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (!cur) return;
+      const modal = document.getElementById('modal-share-chat');
+      const idInput = document.getElementById('modal-share-id');
+      const pathInput = document.getElementById('modal-share-path');
+
+      idInput.value = cur.id;
+      pathInput.value = `data/chats/${cur.id}.json`;
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeShareChatModal() {
+      document.getElementById('modal-share-chat').classList.add('hidden');
+    }
+
+    function copyModalField(fieldId, btn) {
+      const val = document.getElementById(fieldId).value;
+      navigator.clipboard.writeText(val);
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span>Copied!</span>`;
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = origHtml;
+        lucide.createIcons();
+      }, 1500);
+    }
+
+    function copyFullChatJson(btn) {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (!cur) return;
+      const jsonStr = JSON.stringify(cur, null, 2);
+      navigator.clipboard.writeText(jsonStr);
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span>Copied JSON!</span>`;
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = origHtml;
+        lucide.createIcons();
+      }, 1500);
+    }
+
+    function downloadChatJson() {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (!cur) return;
+      const blob = new Blob([JSON.stringify(cur, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${cur.id}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function renderCurrentChatMessages() {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      const container = document.getElementById('chat-messages-container');
+      const titleEl = document.getElementById('chat-active-title');
+      const idEl = document.getElementById('chat-active-id');
+
+      if (!cur) return;
+      if (titleEl) titleEl.innerText = cur.title;
+      if (idEl) idEl.innerText = cur.id;
+
+      if (!cur) return;
+      if (titleEl) titleEl.innerText = cur.title;
+
+      if (!cur.messages || cur.messages.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto py-16">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3 shadow-sm">
+              <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-sm font-semibold text-slate-200 mb-1">Enterprise AI Assistant</h3>
+            <p class="text-xs text-slate-500">
+              Select an authorized model and start chatting below.
+            </p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = cur.messages.map((m, idx) => {
+        const isUser = m.role === 'user';
+        const formattedContent = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(m.content || '') : m.content;
+        const isWrapped = m.isWrapped === true;
+        const lineCount = (m.content || '').split('\n').length;
+
+        if (isUser) {
+          return `
+            <div class="chat-message-item flex justify-end gap-2.5 w-full max-w-3xl ml-auto min-w-0">
+              <div class="bg-indigo-600/20 border border-indigo-500/30 rounded-2xl rounded-tr-none px-4 py-2.5 text-xs text-slate-100 leading-relaxed shadow-sm max-w-[85%] break-words">
+                <p class="whitespace-pre-wrap">${m.content}</p>
+              </div>
+              <div class="w-7 h-7 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 flex-none text-[11px] font-bold">
+                U
+              </div>
+            </div>
+          `;
+        } else {
+          let statsLineHtml = '';
+          const modelName = (m.model || 'Model').replace(/^google\//, '').replace(/^deepseek\//, '');
+          const effortBadge = m.effort ? ` · Effort: ${m.effort}` : '';
+
+          if (m.usage) {
+            const pTokens = m.usage.prompt_tokens ?? 0;
+            const cachedTokens = m.usage.cached_tokens ?? 0;
+            const cTokens = m.usage.completion_tokens ?? 0;
+            const tTokens = m.usage.total_tokens ?? (pTokens + cTokens);
+            const costStr = formatCost(m.usage.cost);
+
+            statsLineHtml = `
+              <div class="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[#1a2336]/60 text-[11px] text-slate-400 font-mono flex-wrap select-text">
+                <button onclick="copyMessageText(this, ${idx})" class="hover:text-slate-200 transition-colors p-1 rounded hover:bg-slate-800 text-slate-400 -ml-1 mr-1" title="Copy response">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+                <span class="text-slate-300 font-semibold">${modelName}</span>
+                <span class="text-slate-600">・</span>
+                <span>${pTokens} prompt_tokens</span>
+                <span class="text-slate-600">・</span>
+                <span>${cachedTokens} cached tokens</span>
+                <span class="text-slate-600">・</span>
+                <span>${cTokens} completion tokens</span>
+                <span class="text-slate-600">・</span>
+                <span>${tTokens} total tokens</span>
+                <span class="text-slate-600">・</span>
+                <span class="text-amber-300 font-semibold">${costStr}</span>
+              </div>
+            `;
+          } else {
+            statsLineHtml = `
+              <div class="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[#1a2336]/60 text-[11px] text-slate-400 font-mono flex-wrap">
+                <button onclick="copyMessageText(this, ${idx})" class="hover:text-slate-200 transition-colors p-1 rounded hover:bg-slate-800 text-slate-400 -ml-1 mr-1" title="Copy response">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+                <span class="text-slate-300 font-semibold">${modelName}</span>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="chat-message-item flex gap-3 w-full max-w-4xl mr-auto min-w-0">
+              <div class="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-none">
+                <i data-lucide="bot" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1 min-w-0 bg-[#111728] border border-[#1e293b] rounded-2xl rounded-tl-none p-3.5 shadow-md overflow-hidden">
+                <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1a2336]/60 text-[10px] text-slate-400 w-full flex-none gap-2">
+                  <span class="font-mono text-emerald-400 font-medium truncate">${m.model || 'LiteLLM Gateway'}${effortBadge}</span>
+                  <div class="flex items-center gap-2 flex-none">
+                    <button
+                      onclick="toggleMessageWrap(${idx})"
+                      class="px-2.5 py-1 rounded-md bg-[#162035] hover:bg-[#1e2d4a] hover:text-emerald-300 text-slate-200 border border-[#2b3d63] transition-colors flex items-center gap-1.5 text-xs font-mono shadow-sm cursor-pointer"
+                      title="${isWrapped ? 'Expand response' : 'Collapse response'}"
+                    >
+                      <i data-lucide="${isWrapped ? 'chevron-down' : 'chevron-up'}" class="w-3.5 h-3.5 text-emerald-400"></i>
+                      <span>${isWrapped ? `Expand (${lineCount} lines)` : 'Collapse'}</span>
+                    </button>
+                  </div>
+                </div>
+                ${isWrapped ? `
+                  <div onclick="toggleMessageWrap(${idx})" class="text-xs text-slate-400 italic cursor-pointer hover:text-slate-200 py-1.5 px-2.5 bg-[#0e1424] rounded border border-[#1e293b]/60 flex items-center justify-between">
+                    <span class="truncate">${(m.content || '').replace(/\n+/g, ' ').slice(0, 90)}...</span>
+                    <span class="text-emerald-400 text-[10px] not-italic font-mono ml-2 flex-none">▶ Click to expand</span>
+                  </div>
+                ` : `
+                  <div class="prose-chat text-xs text-slate-200 leading-relaxed overflow-x-auto min-w-0">
+                    ${formattedContent}
+                  </div>
+                `}
+                ${statsLineHtml}
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function toggleMessageWrap(idx) {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (cur && cur.messages[idx]) {
+        cur.messages[idx].isWrapped = !cur.messages[idx].isWrapped;
+        saveChatThreads();
+        renderCurrentChatMessages();
+      }
+    }
+
+    let allChatWrapped = false;
+    function toggleWrapAllChatMessages() {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (!cur || !cur.messages) return;
+      allChatWrapped = !allChatWrapped;
+      cur.messages.forEach(m => {
+        if (m.role === 'assistant') {
+          m.isWrapped = allChatWrapped;
+        }
+      });
+      saveChatThreads();
+      renderCurrentChatMessages();
+
+      const textEl = document.getElementById('btn-wrap-all-text');
+      if (textEl) {
+        textEl.innerText = allChatWrapped ? 'Expand All' : 'Collapse All';
+      }
+    }
+
+    function handleChatKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    }
+
+    function copyMessageText(btn, idx) {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      if (cur && cur.messages[idx]) {
+        navigator.clipboard.writeText(cur.messages[idx].content);
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i><span class="text-emerald-400">Copied!</span>`;
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          lucide.createIcons();
+        }, 1500);
+      }
+    }
+
+    // =========================================================================
+    // THEORETIC TOKEN COUNTING & COST TRACKING LOGIC
+    // =========================================================================
+    let tokenCountInterval = null;
+    let lastTypingTime = 0;
+    let lastCountedPayloadKey = '';
+    let isFetchingTheoreticTokens = false;
+
+    function handleChatInputTyping() {
+      const inputEl = document.getElementById('chat-user-input');
+      if (!inputEl) return;
+      lastTypingTime = Date.now();
+
+      // Start 2-second interval if not already running
+      if (!tokenCountInterval) {
+        tokenCountInterval = setInterval(checkAndFetchTheoreticTokens, 2000);
+      }
+    }
+
+    async function checkAndFetchTheoreticTokens(force = false) {
+      const inputEl = document.getElementById('chat-user-input');
+      const tokenPill = document.getElementById('input-token-text');
+      if (!inputEl || !tokenPill) return;
+
+      const currentText = inputEl.value;
+      const now = Date.now();
+      const userStoppedTyping = (now - lastTypingTime >= 2000);
+
+      const model = document.getElementById('chat-model-select')?.value || '';
+      const payloadKey = `${activeChatThreadId}:${model}:${currentText}`;
+
+      // If text or model/context changed, compute theoretical token count
+      if (force || payloadKey !== lastCountedPayloadKey) {
+        await requestTheoreticTokenCount(currentText, model);
+        lastCountedPayloadKey = payloadKey;
+      }
+
+      // If user has not input anything more during this 2-second interval, pause the interval
+      if (userStoppedTyping && !force) {
+        if (tokenCountInterval) {
+          clearInterval(tokenCountInterval);
+          tokenCountInterval = null;
+        }
+      }
+    }
+
+    async function requestTheoreticTokenCount(candidateText, model) {
+      const tokenPill = document.getElementById('input-token-text');
+      if (!tokenPill || isFetchingTheoreticTokens) return;
+
+      const curThread = chatThreads.find(t => t.id === activeChatThreadId);
+      const contextMsgs = curThread && curThread.messages ? [...curThread.messages] : [];
+
+      const payloadMessages = contextMsgs.map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const hasCandidate = candidateText && candidateText.trim().length > 0;
+      if (hasCandidate) {
+        payloadMessages.push({
+          role: 'user',
+          content: candidateText.trim()
+        });
+      } else if (payloadMessages.length === 0) {
+        tokenPill.innerText = '~0 tokens (next turn)';
+        return;
+      }
+
+      const systemPromptEl = document.getElementById('chat-system-prompt-text');
+      const systemPrompt = systemPromptEl ? systemPromptEl.innerText.trim() : null;
+
+      const toolsCheckbox = document.getElementById('chat-tools-toggle');
+      const toolsEnabled = toolsCheckbox ? toolsCheckbox.checked : true;
+      const workspaceDir = (typeof currentWorkspacePath !== 'undefined' && currentWorkspacePath) ? currentWorkspacePath : './workspace';
+
+      try {
+        isFetchingTheoreticTokens = true;
+        const res = await fetch('/api/chat/count-tokens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: payloadMessages,
+            model: model || document.getElementById('chat-model-select')?.value,
+            system_prompt: systemPrompt,
+            tools_enabled: toolsEnabled,
+            workspace_dir: workspaceDir
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const count = data.total_tokens ?? 0;
+          tokenPill.innerText = `~${count} tokens (next turn)`;
+        }
+      } catch (err) {
+        console.warn('Failed to fetch theoretic token count:', err);
+      } finally {
+        isFetchingTheoreticTokens = false;
+      }
+    }
+
+    function formatCost(val) {
+      if (val == null || isNaN(val)) return '$0.00';
+      const num = Number(val);
+      if (num === 0) return '$0.00';
+
+      if (num < 1) {
+        // Enforce 0 prefix and avoid scientific notation (e.g. 1.98e-6 -> $0.00000198)
+        let str = num.toFixed(8);
+        str = str.replace(/0+$/, '');
+        const parts = str.split('.');
+        if (parts.length === 2 && parts[1].length < 2) {
+          str = parts[0] + '.' + parts[1].padEnd(2, '0');
+        }
+        return `$${str}`;
+      } else {
+        return `$${num.toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}`;
+      }
+    }
+
+    function updateChatSessionCostBadge() {
+      const cur = chatThreads.find(t => t.id === activeChatThreadId);
+      const costEl = document.getElementById('chat-session-cost-val');
+      if (!costEl) return;
+      if (!cur || !cur.messages || cur.messages.length === 0) {
+        costEl.innerText = '$0.00';
+        return;
+      }
+      let totalCost = 0;
+      cur.messages.forEach(m => {
+        if (m.usage && typeof m.usage.cost === 'number' && !isNaN(m.usage.cost)) {
+          totalCost += m.usage.cost;
+        }
+      });
+      costEl.innerText = formatCost(totalCost);
+    }
+
+    function stopChatStreaming() {
+      if (chatAbortController) {
+        chatAbortController.abort();
+        chatAbortController = null;
+      }
+      isChatStreaming = false;
+      document.getElementById('btn-chat-stop').classList.add('hidden');
+      document.getElementById('btn-chat-send').classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // WORKSPACE & FILE MANAGEMENT ENGINE
+    // =========================================================================
+    let activeWorkspacePath = localStorage.getItem('active_workspace_path') || './workspace';
+    let workspaceFiles = [];
+    let availableWorkspaces = [];
+    let currentExplorerFile = null;
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function initWorkspaces() {
+      try {
+        const res = await fetch('/api/workspaces');
+        if (res.ok) {
+          const data = await res.json();
+          availableWorkspaces = data.workspaces || [];
+        }
+      } catch (err) {
+        console.warn('Failed to load workspaces:', err);
+      }
+      updateWorkspaceUI();
+      refreshWorkspaceFiles();
+    }
+
+    function updateWorkspaceUI() {
+      const sidebarPathEl = document.getElementById('sidebar-workspace-path');
+      const headerNameEl = document.getElementById('chat-header-workspace-name');
+      const explorerPathEl = document.getElementById('explorer-active-path');
+
+      if (sidebarPathEl) {
+        sidebarPathEl.innerText = activeWorkspacePath;
+        sidebarPathEl.title = activeWorkspacePath;
+      }
+      if (headerNameEl) {
+        headerNameEl.innerText = activeWorkspacePath;
+      }
+      if (explorerPathEl) {
+        explorerPathEl.innerText = activeWorkspacePath;
+      }
+
+      renderWorkspaceManagerList();
+    }
+
+    function renderWorkspaceManagerList() {
+      const listContainer = document.getElementById('workspace-manager-list');
+      if (!listContainer) return;
+
+      let list = [...availableWorkspaces];
+      const hasActive = list.some(w => w.path === activeWorkspacePath);
+      if (!hasActive && activeWorkspacePath) {
+        list.unshift({
+          name: activeWorkspacePath.split(/[/\\]/).filter(Boolean).pop() || activeWorkspacePath,
+          path: activeWorkspacePath,
+          is_default: false
+        });
+      }
+
+      if (list.length === 0) {
+        list = [{ name: 'workspace (default)', path: './workspace', is_default: true }];
+      }
+
+      listContainer.innerHTML = list.map(w => {
+        const isCurrent = w.path === activeWorkspacePath;
+        return `
+          <div onclick="selectWorkspace('${w.path}')" class="flex items-center justify-between p-2 rounded cursor-pointer border transition-colors ${
+            isCurrent
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              : 'bg-[#131b2e] border-[#1e293b] text-slate-300 hover:bg-[#1a253f]'
+          }">
+            <div class="flex items-center gap-2 truncate">
+              <i data-lucide="${w.is_default ? 'folder' : 'folder-git-2'}" class="w-4 h-4 ${isCurrent ? 'text-emerald-400' : 'text-indigo-400'} flex-none"></i>
+              <div class="truncate">
+                <div class="font-medium text-xs truncate">${escapeHtml(w.name)}</div>
+                <div class="font-mono text-[10px] text-slate-500 truncate">${escapeHtml(w.path)}</div>
+              </div>
+            </div>
+            ${isCurrent ? '<span class="text-[10px] font-semibold text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-500/20 flex-none">Active</span>' : ''}
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+
+    function openWorkspaceModal() {
+      const modal = document.getElementById('modal-workspace-manager');
+      if (modal) {
+        modal.classList.remove('hidden');
+        initWorkspaces();
+      }
+    }
+
+    function closeWorkspaceModal() {
+      const modal = document.getElementById('modal-workspace-manager');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectWorkspace(wsPath) {
+      if (!wsPath) return;
+      activeWorkspacePath = wsPath;
+      localStorage.setItem('active_workspace_path', wsPath);
+      updateWorkspaceUI();
+      closeWorkspaceModal();
+      currentExplorerFile = null;
+      refreshWorkspaceFiles();
+    }
+
+    async function createNewWorkspace() {
+      const input = document.getElementById('input-new-workspace-name');
+      const name = input ? input.value.trim() : '';
+      if (!name) return;
+
+      try {
+        const res = await fetch('/api/workspaces', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (input) input.value = '';
+          await initWorkspaces();
+          selectWorkspace(data.path);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          alert(err.detail || 'Failed to create workspace directory');
+        }
+      } catch (e) {
+        alert('Network error while creating workspace');
+      }
+    }
+
+    function applyCustomWorkspacePath() {
+      const input = document.getElementById('input-custom-workspace-path');
+      const p = input ? input.value.trim() : '';
+      if (!p) return;
+      selectWorkspace(p);
+      if (input) input.value = '';
+    }
+
+    function openWorkspaceExplorerModal() {
+      const modal = document.getElementById('modal-workspace-explorer');
+      if (modal) {
+        modal.classList.remove('hidden');
+        refreshWorkspaceFiles();
+      }
+    }
+
+    function closeWorkspaceExplorerModal() {
+      const modal = document.getElementById('modal-workspace-explorer');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function refreshWorkspaceFiles(notify = false) {
+      try {
+        const res = await fetch(`/api/workspace/files?workspace=${encodeURIComponent(activeWorkspacePath)}`);
+        if (res.ok) {
+          const data = await res.json();
+          workspaceFiles = data.files || [];
+          const countEl = document.getElementById('sidebar-workspace-count');
+          if (countEl) {
+            const fileOnlyCount = workspaceFiles.filter(f => !f.is_dir).length;
+            countEl.innerText = `${fileOnlyCount} files`;
+          }
+          renderWorkspaceFileTree();
+        }
+      } catch (err) {
+        console.warn('Failed to refresh workspace files:', err);
+      }
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes == null || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(i === 0 ? 0 : 1) + ' ' + sizes[i];
+    }
+
+    function renderWorkspaceFileTree() {
+      const tree = document.getElementById('explorer-file-tree');
+      if (!tree) return;
+
+      if (workspaceFiles.length === 0) {
+        tree.innerHTML = `
+          <div class="text-slate-500 text-center py-8">
+            <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+            <p class="text-xs">Workspace is empty.</p>
+            <p class="text-[10px] mt-1 text-slate-600">Create a file or ask the AI to generate one.</p>
+          </div>
+        `;
+        if (window.lucide && lucide.createIcons) lucide.createIcons();
+        return;
+      }
+
+      tree.innerHTML = workspaceFiles.map(f => {
+        if (f.is_dir) {
+          return `
+            <div class="flex items-center gap-1.5 py-1 px-2 rounded text-slate-400 text-xs select-none">
+              <i data-lucide="folder" class="w-3.5 h-3.5 text-indigo-400 flex-none"></i>
+              <span class="truncate font-semibold">${escapeHtml(f.path)}</span>
+            </div>
+          `;
+        }
+        const isSelected = currentExplorerFile === f.path;
+        return `
+          <div
+            onclick="viewWorkspaceFile('${escapeHtml(f.path)}')"
+            class="flex items-center justify-between py-1.5 px-2 rounded cursor-pointer transition-colors ${
+              isSelected ? 'bg-indigo-600/20 text-emerald-300 font-medium border border-indigo-500/30' : 'text-slate-300 hover:bg-[#131b2e]'
+            }"
+          >
+            <div class="flex items-center gap-1.5 truncate mr-2">
+              <i data-lucide="file-code" class="w-3.5 h-3.5 ${isSelected ? 'text-emerald-400' : 'text-slate-400'} flex-none"></i>
+              <span class="truncate text-xs">${escapeHtml(f.path)}</span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-mono flex-none">${formatFileSize(f.size)}</span>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+
+    async function viewWorkspaceFile(filePath) {
+      currentExplorerFile = filePath;
+      const pathInput = document.getElementById('explorer-current-filepath');
+      const contentArea = document.getElementById('explorer-file-content');
+      const delBtn = document.getElementById('btn-delete-workspace-file');
+
+      if (pathInput) pathInput.value = filePath;
+      if (delBtn) delBtn.classList.remove('hidden');
+
+      renderWorkspaceFileTree();
+
+      if (contentArea) contentArea.value = 'Loading file content...';
+
+      try {
+        const res = await fetch(`/api/workspace/file?workspace=${encodeURIComponent(activeWorkspacePath)}&file_path=${encodeURIComponent(filePath)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (contentArea) contentArea.value = data.content ?? '';
+        } else {
+          const err = await res.json().catch(() => ({}));
+          if (contentArea) contentArea.value = `Error loading file: ${err.detail || res.statusText}`;
+        }
+      } catch (err) {
+        if (contentArea) contentArea.value = `Network error: ${err.message}`;
+      }
+    }
+
+    function promptNewWorkspaceFile() {
+      const filename = prompt('Enter new relative file path (e.g. app.py, utils/helpers.js):', 'new_file.py');
+      if (!filename || !filename.trim()) return;
+
+      currentExplorerFile = filename.trim();
+      const pathInput = document.getElementById('explorer-current-filepath');
+      const contentArea = document.getElementById('explorer-file-content');
+      const delBtn = document.getElementById('btn-delete-workspace-file');
+
+      if (pathInput) pathInput.value = currentExplorerFile;
+      if (contentArea) {
+        contentArea.value = '# New file created in workspace\n';
+        contentArea.focus();
+      }
+      if (delBtn) delBtn.classList.add('hidden');
+    }
+
+    async function saveCurrentActiveFile() {
+      const pathInput = document.getElementById('explorer-current-filepath');
+      const contentArea = document.getElementById('explorer-file-content');
+      const filePath = pathInput ? pathInput.value.trim() : '';
+      if (!filePath) {
+        alert('Please specify a file path before saving.');
+        return;
+      }
+
+      const content = contentArea ? contentArea.value : '';
+      const saveBtn = document.getElementById('btn-save-workspace-file');
+      if (saveBtn) saveBtn.innerText = 'Saving...';
+
+      try {
+        const res = await fetch('/api/workspace/file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            workspace: activeWorkspacePath,
+            file_path: filePath,
+            content: content
+          })
+        });
+
+        if (res.ok) {
+          currentExplorerFile = filePath;
+          const delBtn = document.getElementById('btn-delete-workspace-file');
+          if (delBtn) delBtn.classList.remove('hidden');
+          await refreshWorkspaceFiles();
+          if (saveBtn) {
+            saveBtn.innerText = 'Saved!';
+            setTimeout(() => { if (saveBtn) saveBtn.innerHTML = '<i data-lucide="save" class="w-3 h-3"></i><span>Save File</span>'; lucide.createIcons(); }, 1200);
+          }
+        } else {
+          const err = await res.json().catch(() => ({}));
+          alert(err.detail || 'Failed to save file');
+          if (saveBtn) {
+            saveBtn.innerHTML = '<i data-lucide="save" class="w-3 h-3"></i><span>Save File</span>';
+            lucide.createIcons();
+          }
+        }
+      } catch (err) {
+        alert(`Failed to save file: ${err.message}`);
+        if (saveBtn) {
+          saveBtn.innerHTML = '<i data-lucide="save" class="w-3 h-3"></i><span>Save File</span>';
+          lucide.createIcons();
+        }
+      }
+    }
+
+    async function deleteCurrentActiveFile() {
+      if (!currentExplorerFile) return;
+      if (!confirm(`Are you sure you want to delete '${currentExplorerFile}'?`)) return;
+
+      try {
+        const res = await fetch(`/api/workspace/file?workspace=${encodeURIComponent(activeWorkspacePath)}&file_path=${encodeURIComponent(currentExplorerFile)}`, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          const pathInput = document.getElementById('explorer-current-filepath');
+          const contentArea = document.getElementById('explorer-file-content');
+          const delBtn = document.getElementById('btn-delete-workspace-file');
+
+          if (pathInput) pathInput.value = '';
+          if (contentArea) contentArea.value = '';
+          if (delBtn) delBtn.classList.add('hidden');
+          currentExplorerFile = null;
+
+          await refreshWorkspaceFiles();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          alert(err.detail || 'Failed to delete file');
+        }
+      } catch (err) {
+        alert(`Failed to delete file: ${err.message}`);
+      }
+    }
+
+    let isLiveMessageCollapsed = false;
+    function toggleLiveMessageCollapse() {
+      isLiveMessageCollapsed = !isLiveMessageCollapsed;
+      const target = document.getElementById('chat-streaming-target');
+      const textEl = document.getElementById('live-collapse-text');
+      const iconEl = document.getElementById('live-collapse-icon');
+      if (target) {
+        if (isLiveMessageCollapsed) {
+          target.classList.add('hidden');
+          if (textEl) textEl.innerText = 'Expand';
+          if (iconEl) iconEl.setAttribute('data-lucide', 'chevron-down');
+        } else {
+          target.classList.remove('hidden');
+          if (textEl) textEl.innerText = 'Collapse';
+          if (iconEl) iconEl.setAttribute('data-lucide', 'chevron-up');
+        }
+        if (window.lucide && lucide.createIcons) lucide.createIcons();
+      }
+    }
+
+    async function sendChatMessage() {
+      if (isChatStreaming) return;
+      const input = document.getElementById('chat-user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const curThread = chatThreads.find(t => t.id === activeChatThreadId);
+      if (!curThread) return;
+
+      // Stop token interval and reset input pill
+      if (tokenCountInterval) {
+        clearInterval(tokenCountInterval);
+        tokenCountInterval = null;
+      }
+      lastCountedPayloadKey = '';
+      const tokenPill = document.getElementById('input-token-text');
+      if (tokenPill) tokenPill.innerText = '~0 tokens (next turn)';
+
+      // Append user message (display title remains New Chat <number>)
+      curThread.messages.push({ role: 'user', content: text });
+      saveChatThreads();
+      input.value = '';
+      renderCurrentChatMessages();
+
+      // Setup assistant response container
+      const model = document.getElementById('chat-model-select').value;
+      const effortEl = document.getElementById('chat-effort-select');
+      const effortVal = (!effortEl || effortEl.disabled || !effortEl.value) ? null : effortEl.value;
+      const temperature = 0.7;
+      const systemPromptEl = document.getElementById('chat-system-prompt-text');
+      const systemPrompt = systemPromptEl ? systemPromptEl.innerText.trim() : "You are a senior enterprise AI assistant.";
+
+      const toolsCheckbox = document.getElementById('chat-tools-toggle');
+      const toolsEnabled = toolsCheckbox ? toolsCheckbox.checked : true;
+
+      // Create live assistant placeholder
+      const container = document.getElementById('chat-messages-container');
+      const assistantMsgIdx = curThread.messages.length;
+      curThread.messages.push({ role: 'assistant', content: '', model: model, effort: effortVal });
+
+      const effortBadge = effortVal ? ` · Effort: ${effortVal}` : '';
+      isLiveMessageCollapsed = false;
+
+      const assistantMsgWrapper = document.createElement('div');
+      assistantMsgWrapper.className = "flex gap-3 w-full max-w-4xl mr-auto min-w-0";
+      assistantMsgWrapper.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-none">
+          <i data-lucide="bot" class="w-4 h-4"></i>
+        </div>
+        <div class="flex-1 min-w-0 bg-[#111728] border border-[#1e293b] rounded-2xl rounded-tl-none p-3.5 shadow-md overflow-hidden">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1a2336] text-[10px] text-slate-400 w-full flex-none gap-2">
+            <span class="font-mono text-emerald-400 font-medium truncate">${model}${effortBadge}</span>
+            <div class="flex items-center gap-2 flex-none">
+              <span id="chat-live-status" class="text-indigo-400 animate-pulse font-mono">Thinking...</span>
+              <button
+                id="btn-live-collapse"
+                onclick="toggleLiveMessageCollapse()"
+                class="px-2.5 py-1 rounded-md bg-[#162035] hover:bg-[#1e2d4a] hover:text-emerald-300 text-slate-200 border border-[#2b3d63] transition-colors flex items-center gap-1.5 text-xs font-mono shadow-sm cursor-pointer"
+                title="Collapse or expand this response"
+              >
+                <i id="live-collapse-icon" data-lucide="chevron-up" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span id="live-collapse-text">Collapse</span>
+              </button>
+            </div>
+          </div>
+          <div id="chat-streaming-target" class="prose-chat text-xs text-slate-200 leading-relaxed overflow-x-auto min-w-0 streaming-cursor"></div>
+        </div>
+      `;
+      container.appendChild(assistantMsgWrapper);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+
+      const streamingTarget = document.getElementById('chat-streaming-target');
+      const statusSpan = document.getElementById('chat-live-status');
+
+      // Update UI buttons
+      isChatStreaming = true;
+      document.getElementById('btn-chat-send').classList.add('hidden');
+      document.getElementById('btn-chat-stop').classList.remove('hidden');
+
+      chatAbortController = new AbortController();
+
+      let assistantAccumulator = "";
+      let turnUsage = null;
+
+      try {
+        const payloadMessages = curThread.messages.slice(0, -1).map(m => ({
+          role: m.role,
+          content: m.content
+        }));
+
+        const response = await fetch('/api/chat/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: chatAbortController.signal,
+          body: JSON.stringify({
+            messages: payloadMessages,
+            model: model,
+            temperature: temperature,
+            system_prompt: systemPrompt,
+            tools_enabled: toolsEnabled,
+            workspace_dir: activeWorkspacePath,
+            effort: effortVal
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          buffer = parts.pop() || '';
+
+          for (const part of parts) {
+            if (part.startsWith('data: ')) {
+              try {
+                const event = JSON.parse(part.substring(6));
+                if (event.type === 'chunk') {
+                  assistantAccumulator += event.content;
+                  if (statusSpan) statusSpan.innerText = 'Streaming...';
+                  streamingTarget.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(assistantAccumulator) : assistantAccumulator;
+                  container.scrollTop = container.scrollHeight;
+                } else if (event.type === 'tool_call') {
+                  const tc = event.content || event;
+                  const toolName = tc.tool_name || event.tool_name || 'workspace_tool';
+                  const toolArgs = tc.arguments || event.arguments || {};
+                  if (statusSpan) statusSpan.innerText = `Calling: ${toolName}...`;
+                  const argsStr = typeof toolArgs === 'string' ? toolArgs : JSON.stringify(toolArgs, null, 2);
+                  assistantAccumulator += `\n\n<details open class="my-2.5 rounded-lg border border-indigo-500/30 bg-[#0c1220] overflow-hidden text-xs"><summary class="px-3 py-1.5 bg-[#12192b] border-b border-indigo-500/20 font-mono text-indigo-300 font-semibold cursor-pointer select-none flex items-center justify-between hover:bg-[#162038]"><span>⚙️ Action: <code>${escapeHtml(toolName)}</code></span><span class="text-[10px] text-slate-500 font-normal">Click to toggle</span></summary><div class="p-2.5 bg-[#080c14] overflow-x-auto font-mono text-[11px] text-slate-300"><pre><code>${escapeHtml(argsStr)}</code></pre></div></details>\n\n`;
+                  streamingTarget.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(assistantAccumulator) : assistantAccumulator;
+                  container.scrollTop = container.scrollHeight;
+                } else if (event.type === 'tool_result') {
+                  const tr = event.content || event;
+                  const toolName = tr.tool_name || event.tool_name || 'workspace_tool';
+                  const toolResult = tr.result !== undefined ? tr.result : event.result;
+                  if (statusSpan) statusSpan.innerText = `Finished: ${toolName}`;
+                  const resStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2);
+                  const shortRes = resStr.length > 2500 ? resStr.slice(0, 2500) + '\n... (truncated for display)' : resStr;
+                  assistantAccumulator += `\n\n<details open class="my-2.5 rounded-lg border border-emerald-500/30 bg-[#0c1220] overflow-hidden text-xs"><summary class="px-3 py-1.5 bg-[#0f1a26] border-b border-emerald-500/20 font-mono text-emerald-400 font-semibold cursor-pointer select-none flex items-center justify-between hover:bg-[#132233]"><span>📁 Output: <code>${escapeHtml(toolName)}</code></span><span class="text-[10px] text-slate-500 font-normal">Click to toggle</span></summary><div class="p-2.5 bg-[#080c14] max-h-72 overflow-y-auto font-mono text-[11px] text-slate-300"><pre><code>${escapeHtml(shortRes)}</code></pre></div></details>\n\n`;
+                  streamingTarget.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(assistantAccumulator) : assistantAccumulator;
+                  container.scrollTop = container.scrollHeight;
+                } else if (event.type === 'usage') {
+                  if (event.usage) {
+                    turnUsage = event.usage;
+                  }
+                } else if (event.type === 'done') {
+                  if (event.usage) {
+                    turnUsage = event.usage;
+                  }
+                } else if (event.type === 'status') {
+                  if (statusSpan) statusSpan.innerText = event.content;
+                } else if (event.type === 'error') {
+                  assistantAccumulator += `\n\n> ⚠️ **Error:** ${event.content}`;
+                  streamingTarget.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(assistantAccumulator) : assistantAccumulator;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          assistantAccumulator += `\n\n> ⚠️ **Request Failed:** ${err.message}`;
+          streamingTarget.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(assistantAccumulator) : assistantAccumulator;
+        }
+      } finally {
+        isChatStreaming = false;
+        chatAbortController = null;
+        document.getElementById('btn-chat-send').classList.remove('hidden');
+        document.getElementById('btn-chat-stop').classList.add('hidden');
+
+        if (statusSpan) statusSpan.remove();
+        if (streamingTarget) streamingTarget.classList.remove('streaming-cursor');
+
+        // Persist final message with usage
+        curThread.messages[assistantMsgIdx] = {
+          role: 'assistant',
+          content: assistantAccumulator,
+          model: model,
+          effort: effortVal,
+          usage: turnUsage
+        };
+        saveChatThreads();
+        updateChatSessionCostBadge();
+        renderCurrentChatMessages();
+        refreshWorkspaceFiles();
+      }
+    }
+
+    // =========================================================================
+    // 4. WORKFLOW MODE LOGIC (ORIGINAL HIGH-FIDELITY IMPLEMENTATION)
+    // =========================================================================
+    function renderWorkflowModels(models) {
+      const select = document.getElementById('model-select');
+      select.innerHTML = models.map(m => `<option value="${m}">${m.replace('google/', '').replace('deepseek/', '')}</option>`).join('');
+    }
+
+    function renderTabs() {
+      const container = document.getElementById('ticket-tabs');
+      container.innerHTML = tickets.map(t => {
+        const isActive = t.id === activeTicketId;
+        const isNewTab = t.id.startsWith('new-');
+        const displayName = isNewTab ? 'Open ticket...' : `${t.id} ${t.title.split(' ')[0]}`;
+
+        return `
+          <div onclick="selectTicket('${t.id}')" class="group flex items-center gap-2 px-3 py-1.5 cursor-pointer border-r border-[#151d30] transition-colors ${
+            isActive ? 'bg-[#151d30] text-emerald-400 font-medium border-t-2 border-t-emerald-400' : 'text-slate-400 hover:text-slate-200 hover:bg-[#111726]'
+          }">
+            <span class="truncate max-w-[200px] text-[11px]">${displayName}</span>
+            <button onclick="event.stopPropagation(); closeTicket('${t.id}')" class="opacity-0 group-hover:opacity-100 hover:text-rose-400 transition-opacity ml-1">
+              <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+          </div>
+        `;
+      }).join('') + `
+        <button onclick="addEmptyTicketTab()" class="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-[#111726] rounded-r" title="Open new tab">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+        </button>
+      `;
+      lucide.createIcons();
+    }
+
+    function addEmptyTicketTab() {
+      const newId = `new-${Date.now()}`;
+      tickets.push({ id: newId, title: "Open ticket...", code: "NEW", tags: [] });
+      activeTicketId = newId;
+      renderTabs();
+      showEmptyState();
+    }
+
+    function closeTicket(id) {
+      if (tickets.length <= 1) return;
+      tickets = tickets.filter(t => t.id !== id);
+      if (activeTicketId === id) {
+        selectTicket(tickets[0].id);
+      } else {
+        renderTabs();
+      }
+    }
+
+    function showEmptyState() {
+      document.getElementById('view-empty-tab').classList.remove('hidden');
+      document.getElementById('ticket-banner').classList.add('hidden');
+      document.getElementById('view-overview').classList.add('hidden');
+      document.getElementById('view-execution').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    function handleOpenExistingTicket() {
+      const inputVal = document.getElementById('input-ticket-search').value.trim() || 'SMS-22220';
+      const curTab = tickets.find(t => t.id === activeTicketId);
+      if (curTab) {
+        curTab.id = inputVal;
+        curTab.code = inputVal;
+        curTab.title = `[ALB/Theory] ${inputVal} Automated Feature Spec`;
+        curTab.tags = ['CR', 'In Progress', 'pin'];
+        activeTicketId = inputVal;
+      }
+      renderTabs();
+      loadWorkflow(inputVal);
+    }
+
+    function handleCreateNewProject() {
+      handleOpenExistingTicket();
+    }
+
+    async function loadWorkflow(ticketId) {
+      if (ticketId.startsWith('new-')) {
+        showEmptyState();
+        return;
+      }
+
+      document.getElementById('view-empty-tab').classList.add('hidden');
+      document.getElementById('ticket-banner').classList.remove('hidden');
+
+      const ticket = tickets.find(t => t.id === ticketId);
+      if (ticket) {
+        document.getElementById('banner-code').innerText = `${ticket.code}:`;
+        document.getElementById('banner-title').innerText = ticket.title;
+      }
+
+      try {
+        const res = await fetch(`/api/tickets/${ticketId}/workflow`);
+        if (res.ok) {
+          workflow = await res.json();
+          activeStageId = workflow.active_stage_id || "DESIGN";
+          
+          if (isExecutionView) {
+            renderExecutionView();
+          } else {
+            renderOverviewView();
+          }
+        }
+      } catch (e) {
+        console.error("Workflow load error:", e);
+      }
+    }
+
+    function selectTicket(id) {
+      activeTicketId = id;
+      renderTabs();
+      if (id.startsWith('new-')) {
+        showEmptyState();
+      } else {
+        loadWorkflow(id);
+      }
+    }
+
+    function selectStage(stageId) {
+      activeStageId = stageId;
+      if (isExecutionView) {
+        renderExecutionView();
+      } else {
+        renderOverviewView();
+      }
+    }
+
+    function renderOverviewView() {
+      isExecutionView = false;
+      document.getElementById('view-overview').classList.remove('hidden');
+      document.getElementById('view-execution').classList.add('hidden');
+
+      if (!workflow) return;
+
+      // 1. Horizontal Pipeline Nodes
+      const container = document.getElementById('horizontal-pipeline-nodes');
+      container.innerHTML = workflow.stages.map((st, i) => {
+        const isCompleted = st.status === 'completed';
+        const isActive = st.id === activeStageId;
+        const iconName = STAGE_ICONS[st.id] || 'circle';
+
+        const line = i > 0 ? `<div class="flex-1 h-[2px] mx-1 ${isCompleted || isActive ? 'bg-emerald-500/70' : 'bg-slate-800'}"></div>` : '';
+        const nodeClass = isActive
+          ? 'bg-indigo-600/20 text-indigo-400 ring-2 ring-indigo-500 ring-offset-2 ring-offset-[#0c1220] shadow-[0_0_12px_rgba(99,102,241,0.4)]'
+          : isCompleted
+          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/20'
+          : 'bg-slate-900/60 text-slate-500 border border-slate-800 hover:text-slate-300';
+
+        const underline = isActive ? `<div class="w-4 h-[2px] bg-indigo-400 rounded mt-0.5"></div>` : '';
+
+        return `
+          ${line}
+          <div onclick="selectStage('${st.id}')" class="flex flex-col items-center cursor-pointer group">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all ${nodeClass}">
+              <i data-lucide="${iconName}" class="w-4 h-4"></i>
+            </div>
+            <span class="text-[10px] font-semibold mt-1 tracking-wider ${isActive ? 'text-indigo-400' : isCompleted ? 'text-emerald-400' : 'text-slate-500'}">${st.name}</span>
+            <span class="text-[9px] text-slate-500 font-mono">${st.count}</span>
+            ${underline}
+          </div>
+        `;
+      }).join('');
+
+      // 2. Subtask Card under horizontal stepper
+      const curStage = workflow.stages.find(s => s.id === activeStageId) || workflow.stages[0];
+      if (curStage) {
+        document.getElementById('overview-subcard-title').innerText = curStage.label || curStage.name;
+        document.getElementById('overview-subcard-count').innerText = curStage.count;
+        document.getElementById('overview-subcard-badge').innerText = curStage.status === 'completed' ? 'Done' : 'active';
+        document.getElementById('overview-subcard-code').innerText = curStage.code || 'SMS-23005';
+        document.getElementById('overview-subcard-status').innerText = curStage.badge || 'To Do';
+        document.getElementById('overview-subcard-desc').innerText = curStage.subcard_desc || `[${curStage.name}] Tasks`;
+
+        const stepperEl = document.getElementById('overview-subcard-stepper');
+        stepperEl.innerHTML = curStage.subtasks.map((sub, i) => {
+          const isDone = sub.status === 'Done';
+          const divider = i > 0 ? '<div class="w-8 h-[2px] bg-slate-700/60"></div>' : '';
+          return `
+            ${divider}
+            <div onclick="openExecutionMode('${curStage.id}', '${sub.name}')" class="flex items-center gap-1.5 cursor-pointer hover:bg-slate-800/60 px-2 py-1 rounded transition-all">
+              <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" class="w-3.5 h-3.5 ${isDone ? 'text-emerald-400' : 'text-slate-500'}"></i>
+              <span class="${isDone ? 'text-emerald-400 font-medium' : 'text-slate-400'}">${sub.name}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    function openExecutionMode(stageId, subtaskName) {
+      activeStageId = stageId;
+      isExecutionView = true;
+      renderExecutionView(subtaskName);
+    }
+
+    function closeExecutionMode() {
+      isExecutionView = false;
+      renderOverviewView();
+    }
+
+    function renderExecutionView(subtaskName) {
+      document.getElementById('view-overview').classList.add('hidden');
+      document.getElementById('view-execution').classList.remove('hidden');
+
+      if (!workflow) return;
+
+      const curStage = workflow.stages.find(s => s.id === activeStageId) || workflow.stages[0];
+
+      // 1. Vertical Stepper in left sidebar
+      const vertContainer = document.getElementById('vertical-pipeline-nodes');
+      vertContainer.innerHTML = workflow.stages.map((st, i) => {
+        const isCompleted = st.status === 'completed';
+        const isActive = st.id === activeStageId;
+        const iconName = STAGE_ICONS[st.id] || 'circle';
+
+        const nodeClass = isActive
+          ? 'bg-indigo-600/20 text-indigo-400 ring-2 ring-indigo-500'
+          : isCompleted
+          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/40'
+          : 'bg-slate-900/60 text-slate-500 border border-slate-800';
+
+        const activeCardWrapper = isActive
+          ? 'bg-[#151d30] border border-indigo-500/40 shadow-sm'
+          : 'hover:bg-[#111726] border border-transparent';
+
+        const dotIndicator = isActive ? `<div class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2"></div>` : '';
+
+        return `
+          <div onclick="selectStage('${st.id}')" class="flex items-center justify-between p-1.5 rounded-lg cursor-pointer transition-colors ${activeCardWrapper}">
+            <div class="flex items-center gap-2.5">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center ${nodeClass}">
+                <i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-semibold ${isActive ? 'text-slate-100' : isCompleted ? 'text-emerald-400' : 'text-slate-400'}">${st.name}</span>
+                <span class="text-[10px] text-slate-500 font-mono">${st.count}</span>
+              </div>
+            </div>
+            ${dotIndicator}
+          </div>
+        `;
+      }).join('');
+
+      // 2. Mini Subtask Card at bottom of left sidebar
+      const miniCard = document.getElementById('sidebar-mini-card');
+      miniCard.innerHTML = `
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="font-semibold text-slate-200 text-xs">${curStage.label || curStage.name}</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded-full ${curStage.status === 'completed' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-500/20 text-emerald-300'} font-medium">
+              ${curStage.status === 'completed' ? 'Done' : 'active'}
+            </span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono">${curStage.count}</span>
+        </div>
+        <div class="bg-[#0e1424] border border-[#1a2336] rounded p-2 text-[11px]">
+          <div class="flex items-center gap-1 mb-1">
+            <span class="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[10px] font-medium">${curStage.code}</span>
+            <span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[9px] font-medium">${curStage.badge || 'To Do'}</span>
+          </div>
+          <p class="text-[10px] text-slate-400 mb-2 truncate">${curStage.subcard_desc}</p>
+          <div class="flex items-center gap-2 pt-0.5 overflow-x-auto text-[10px]">
+            ${curStage.subtasks.map((sub, i) => `
+              ${i > 0 ? '<div class="w-4 h-[1px] bg-slate-700"></div>' : ''}
+              <div class="flex items-center gap-1">
+                <i data-lucide="${sub.status === 'Done' ? 'check-circle-2' : 'circle'}" class="w-3 h-3 ${sub.status === 'Done' ? 'text-emerald-400' : 'text-slate-500'}"></i>
+                <span class="${sub.status === 'Done' ? 'text-emerald-400' : 'text-slate-400'}">${sub.name}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      // 3. Right Console Header & Presets
+      const displayTitle = subtaskName || curStage.console_title || `${curStage.name} Execution`;
+      document.getElementById('exec-title').innerText = displayTitle;
+      document.getElementById('exec-subtitle').innerText = curStage.console_subtitle || `Execution scope for ${curStage.code}`;
+      document.getElementById('preset-prompt-input').value = curStage.preset_prompt || `/dev-${curStage.name.toLowerCase()} run ${activeTicketId}`;
+
+      lucide.createIcons();
+    }
+
+    // Load context toggle
+    document.getElementById('btn-context').addEventListener('click', () => {
+      contextLoaded = !contextLoaded;
+      const label = document.getElementById('context-label');
+      const status = document.getElementById('context-status');
+      if (contextLoaded) {
+        label.innerText = 'Context loaded';
+        status.innerText = 'ready (4.2 kB) →';
+      } else {
+        label.innerText = 'Load context';
+        status.innerText = 'not loaded yet →';
+      }
+    });
+
+    // Start / Execute Handler (SSE Streaming)
+    document.getElementById('btn-start').addEventListener('click', async () => {
+      if (isExecuting) return;
+      isExecuting = true;
+
+      const btn = document.getElementById('btn-start');
+      btn.innerHTML = `<div class="w-3 h-3 rounded-full border-2 border-slate-900 border-t-transparent animate-spin"></div><span>Executing...</span>`;
+      btn.classList.add('bg-slate-600', 'text-slate-400', 'cursor-not-allowed');
+
+      document.getElementById('ready-placeholder').classList.add('hidden');
+      const streamDiv = document.getElementById('stream-content');
+      streamDiv.classList.remove('hidden');
+      streamDiv.innerHTML = `
+        <div class="text-[11px] p-2 rounded text-slate-400 bg-slate-900/50">
+          🚀 Initializing task for ${activeTicketId} on model ${document.getElementById('model-select').value}...
+        </div>
+        <div id="output-text" class="p-3.5 bg-[#0e1424] border border-[#1a2338] rounded text-slate-200 leading-relaxed whitespace-pre-wrap"></div>
+      `;
+
+      const outputText = document.getElementById('output-text');
+
+      try {
+        const response = await fetch('/api/execute/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticket_id: activeTicketId,
+            stage_id: activeStageId,
+            preset_prompt: document.getElementById('preset-prompt-input').value,
+            additional_instructions: document.getElementById('additional-input').value,
+            model: document.getElementById('model-select').value,
+            effort: document.getElementById('effort-select').value
+          })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          buffer = parts.pop() || '';
+
+          for (const part of parts) {
+            if (part.startsWith('data: ')) {
+              try {
+                const event = JSON.parse(part.substring(6));
+                if (event.type === 'chunk') {
+                  outputText.innerText += event.content;
+                } else if (event.type === 'status') {
+                  const statusCard = document.createElement('div');
+                  statusCard.className = 'text-[11px] p-2 rounded text-indigo-300 bg-indigo-950/30 border border-indigo-800/40 mb-2';
+                  statusCard.innerText = event.content;
+                  streamDiv.insertBefore(statusCard, outputText);
+                } else if (event.type === 'error') {
+                  const errCard = document.createElement('div');
+                  errCard.className = 'text-[11px] p-2 rounded text-rose-300 bg-rose-950/40 border border-rose-800/40 mb-2';
+                  errCard.innerText = event.content;
+                  streamDiv.insertBefore(errCard, outputText);
+                } else if (event.type === 'done') {
+                  if (event.cost) document.getElementById('session-cost').innerText = event.cost;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+      } catch (err) {
+        outputText.innerText += `\n[Error: ${err.message}]`;
+      } finally {
+        isExecuting = false;
+        btn.innerHTML = `<i data-lucide="play" class="w-3 h-3 fill-current"></i><span>Start</span>`;
+        btn.classList.remove('bg-slate-600', 'text-slate-400', 'cursor-not-allowed');
+        btn.classList.add('bg-emerald-400', 'text-slate-950');
+        lucide.createIcons();
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
